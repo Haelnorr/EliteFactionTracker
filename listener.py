@@ -6,9 +6,6 @@ import time
 import bgsapi
 import database
 import log
-import json
-from definitions import ROOT_DIR
-from os import path
 from datetime import datetime
 
 # config
@@ -84,10 +81,6 @@ def consumer(pipeline, shutdown):
             try:
                 system_db = database.fetch_system(db_conn, system_name)
                 log.info('System match found: %s; processing data' % system_db.name)
-                filename = system_name + '.json'
-                file_path = path.join(ROOT_DIR, 'dump', filename)
-                with open(file_path, 'w') as outfile:
-                    json.dump(message, outfile, indent=4)
                 process_data(system_db, message)
 
             except TypeError:
