@@ -236,7 +236,7 @@ def new_faction(conn, data):
     conn.commit()
 
 
-def fetch_faction(conn, faction):
+def fetch_faction(conn, faction=None):
     """
     Fetches data from the database on a specified faction
     :param conn: the database connection object
@@ -244,13 +244,19 @@ def fetch_faction(conn, faction):
     :return: 'Faction' object
     """
     cur = conn.cursor()
-    try:
-        int(faction)
-        cur.execute("SELECT * FROM Faction WHERE faction_id=?", (faction,))
-    except ValueError:
-        cur.execute("SELECT * FROM Faction WHERE name=?", (faction,))
+    f = []
+    if faction is not None:
+        try:
+            int(faction)
+            cur.execute('SELECT * FROM Faction WHERE faction_id=?', (faction,))
+        except ValueError:
+            cur.execute('SELECT * FROM Faction WHERE name=?', (faction,))
+        f = classes.Faction(cur.fetchone())
+    else:
+        cur.execute('SELECT * FROM Faction')
+        for faction in cur.fetchall():
+            f.append(classes.Faction(faction))
 
-    f = classes.Faction(cur.fetchone())
     return f
 
 
@@ -289,25 +295,24 @@ def new_presence(conn, data):
 
 def fetch_presence(conn, sys_id=None, fac_id=None):
     """
-    Fetches data from the database on a presence entry for a specified faction or system. MUST SPECIFY ONE OR BOTH
+    Fetches data from the database on a presence entry for a specified faction or system.
     :param conn: the database connection object
     :param sys_id: (Optional) the 'system_id' to search for or 'ALL' for all systems
     :param fac_id: (Optional) the 'faction_id' to search for or 'ALL' for all factions
-    :return: Returns all results as list of 'Presence' objects. If single result, returns single object. Returns 'None' if neither parameter is specified
+    :return: Returns all results as list of 'Presence' objects. If single result, returns single object
     """
     cur = conn.cursor()
+    result = []
     if sys_id is None and fac_id is not None:
         sql = 'SELECT * FROM Presence WHERE faction_id=?'
         cur.execute(sql, (fac_id,))
         _list = cur.fetchall()
-        result = []
         for r in _list:
             result.append(classes.Presence(r))
     elif sys_id is not None and fac_id is None:
         sql = 'SELECT * FROM Presence WHERE system_id=?'
         cur.execute(sql, (sys_id,))
         _list = cur.fetchall()
-        result = []
         for r in _list:
             result.append(classes.Presence(r))
     elif sys_id is not None and fac_id is not None:
@@ -315,7 +320,10 @@ def fetch_presence(conn, sys_id=None, fac_id=None):
         cur.execute(sql, (sys_id, fac_id))
         result = classes.Presence(cur.fetchone())
     else:
-        result = None
+        sql = 'SELECT * FROM Presence'
+        cur.execute(sql)
+        for presence in cur.fetchall():
+            result.append(classes.Presence(presence))
     return result
 
 
@@ -350,19 +358,24 @@ def new_expansion(conn, data):
     conn.commit()
 
 
-def fetch_expansion(conn, fac_id):
+def fetch_expansion(conn, fac_id=None):
     """
-    Fetches data from the database on an expansion for a specified faction
+    Fetches data on expansions from the database
     :param conn: the database connection object
-    :param fac_id: the ID of the faction
-    :return: 'Expansion' object
+    :param fac_id: (Optional) the ID of the faction
+    :return: list of 'Expansion' objects or single object if fac_id is specified
     """
-    sql = '''SELECT * FROM Expansion WHERE faction_id=?'''
-
     cur = conn.cursor()
-    cur.execute(sql, (fac_id,))
-
-    e = classes.Expansion(cur.fetchone())
+    e = []
+    if fac_id is not None:
+        sql = '''SELECT * FROM Expansion WHERE faction_id=?'''
+        cur.execute(sql, (fac_id,))
+        e = classes.Expansion(cur.fetchone())
+    else:
+        sql = '''SELECT * FROM Expansion'''
+        cur.execute(sql)
+        for expansion in cur.fetchall():
+            e.append(classes.Expansion(expansion))
     return e
 
 
@@ -495,25 +508,31 @@ def new_retreat(conn, data):
     conn.commit()
 
 
-def fetch_retreat(conn, fac_id, sys_id=None):
+def fetch_retreat(conn, fac_id=None, sys_id=None):
     """
-    Fetches data from the database on a retreats for a specified faction
+    Fetches data of retreats from the database
     :param conn: the database connection object
-    :param fac_id: the ID of the faction
-    :param sys_id: (Optional) the ID of the system
+    :param fac_id: (Optional) the ID of the faction
+    :param sys_id: (Optional) the ID of the system (fac_id must be specified)
     :return: list of 'Retreat' objects, or single retreat object if sys_id is specified
     """
     cur = conn.cursor()
     r = []
-    if sys_id is None:
-        sql = '''SELECT * FROM Retreat WHERE faction_id=?'''
-        cur.execute(sql, (fac_id,))
+    if fac_id is not None:
+        if sys_id is None:
+            sql = '''SELECT * FROM Retreat WHERE faction_id=?'''
+            cur.execute(sql, (fac_id,))
+            for retreat in cur.fetchall():
+                r.append(classes.Retreat(retreat))
+        else:
+            sql = '''SELECT * FROM Retreat WHERE faction_id=? AND system_id=?'''
+            cur.execute(sql, (fac_id, sys_id))
+            r = classes.Retreat(cur.fetchone())
+    else:
+        sql = '''SELECT * FROM Retreat'''
+        cur.execute(sql)
         for retreat in cur.fetchall():
             r.append(classes.Retreat(retreat))
-    else:
-        sql = '''SELECT * FROM Retreat WHERE faction_id=? AND system_id=?'''
-        cur.execute(sql, (fac_id, sys_id))
-        r = classes.Retreat(cur.fetchone())
 
     return r
 
