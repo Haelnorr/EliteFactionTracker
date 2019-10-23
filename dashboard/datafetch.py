@@ -63,10 +63,6 @@ def get_alerts():
     return alerts
 
 
-
-
-
-
 def get_system(system):
     system_db = database.fetch_system(__conn, system)
 
@@ -114,7 +110,7 @@ def time_since(timestamp):
     :param timestamp: timestamp from the database
     :return: clean 'time since' string
     """
-    now = datetime.now()
+    now = datetime.utcnow()
 
     # convert the time to datetime object and get time difference
     time = datetime.strptime(timestamp, database.DATETIME_FMT)
