@@ -42,8 +42,17 @@ def get_alerts():
                 influence = round(presence.influence[0]*100, 1)
                 if influence < 9:
                     # check conflicts
-                    if False:
-                        alert = '{faction} influence may drop below 5% if conflict against {opponent} is lost in {system}'
+                    if not faction.conflict_flags == 0:
+                        try:
+                            conflict = database.fetch_conflict(__conn, sys_id=system.system_id, fac_name=faction.name)
+                            opponent = conflict.faction_name_1
+                            if faction.name in opponent:
+                                opponent = conflict.faction_name_2
+                            alert = '{faction} influence may drop below 5% if conflict against {opponent} is lost in {system}'
+                            alert = alert.format(faction=faction.name, opponent=opponent, system=system.name)
+                            alerts.append(alert)
+                        except TypeError:
+                            pass
                     elif influence < 5:
                         alert = '{faction} influence below 5% in {system}'
                         alert = alert.format(faction=faction.name, system=system.name)

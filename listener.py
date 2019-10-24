@@ -144,7 +144,7 @@ def process_data(system_db, message):
                 try:
                     conflict_db = database.fetch_conflict(db_conn, sys_id=system_db.system_id, fac_name=conflict['Faction1']['Name'])
 
-                    if conflict['Status'] in '':
+                    if conflict['Status'] == '':
                         database.delete_conflict(db_conn, conflict_db.conflict_id)
                         log.debug('Deleted conflict for %s in %s' % (conflict['Faction1']['Name'], system_db.name))
                     else:
@@ -168,20 +168,21 @@ def process_data(system_db, message):
                         log.info('Conflict updated: %s' % conflict_db.conflict_id)
                 except TypeError:
                     # conflict not in database
-                    conflict_entry = (
-                        system_db.system_id,
-                        conflict['Faction1']['Name'],
-                        conflict['Faction2']['Name'],
-                        conflict['Faction1']['WonDays'],
-                        conflict['Faction2']['WonDays'],
-                        conflict['Faction1']['Stake'],
-                        conflict['Faction2']['Stake'],
-                        timestamp,
-                        conflict['Status'],
-                        timestamp
-                    )
-                    database.new_conflict(db_conn, conflict_entry)
-                    log.info('New conflict found')
+                    if not conflict['Status'] == '':
+                        conflict_entry = (
+                            system_db.system_id,
+                            conflict['Faction1']['Name'],
+                            conflict['Faction2']['Name'],
+                            conflict['Faction1']['WonDays'],
+                            conflict['Faction2']['WonDays'],
+                            conflict['Faction1']['Stake'],
+                            conflict['Faction2']['Stake'],
+                            timestamp,
+                            conflict['Status'],
+                            timestamp
+                        )
+                        database.new_conflict(db_conn, conflict_entry)
+                        log.info('New conflict found')
         except KeyError:
             log.debug('No conflict found in %s' % system_db.name)
 
@@ -215,7 +216,7 @@ def process_data(system_db, message):
                                 database.new_expansion(db_conn, expansion_entry)
                                 log.info('New expansion found: %s' % faction[1].name)
 
-                        elif state['State'] in 'Retreat' and faction[1].home_system_id is not system_db.system_id:
+                        elif state['State'] in 'Retreat':
                             # retreat found
                             try:
                                 # retreat exists
@@ -268,7 +269,7 @@ def process_data(system_db, message):
                                 database.new_expansion(db_conn, expansion_entry)
                                 log.info('New expansion found: %s' % faction[1].name)
 
-                        elif state['State'] in 'Retreat' and faction[1].home_system_id is not system_db.system_id:
+                        elif state['State'] in 'Retreat':
                             # retreat found
                             try:
                                 # retreat exists
@@ -307,7 +308,7 @@ def process_data(system_db, message):
                             except TypeError:
                                 # new expansion found
                                 log.debug('Recovering expansion found: %s' % faction[1].name)
-                        elif state['State'] in 'Retreat' and faction[1].home_system_id is not system_db.system_id:
+                        elif state['State'] in 'Retreat':
                             # retreat found
                             try:
                                 retreat_db = database.fetch_retreat(db_conn, faction[1].faction_id, sys_id=system_db.system_id)
