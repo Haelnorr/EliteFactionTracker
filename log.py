@@ -9,8 +9,8 @@ __print_to_console = True   # set 'True' for logging to console
 __DEBUG = False            # set 'True' for debug messages
 
 
-def main():
-    log_file = path.join(ROOT_DIR, 'logs', 'tracker.log')
+def start(filename):
+    log_file = path.join(ROOT_DIR, 'logs', '{filename}.log'.format(filename=filename))
     log_level = logging.INFO
     if __DEBUG:
         log_level = logging.DEBUG
@@ -47,5 +47,3 @@ def log_timestamp():
     timestamp = '[' + datetime.strftime(now, __datetime_fmt) + ']:'
     return timestamp
 
-
-main()

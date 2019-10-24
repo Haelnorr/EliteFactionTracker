@@ -24,7 +24,7 @@ def connect():
 
     # attempt to connect to the database
     try:
-        conn = sqlite3.connect(file_path)
+        conn = sqlite3.connect(file_path, check_same_thread=False)
         log.info('Connected to database file: ' + file_path)
     except Error as e:
         log.error(str(e))

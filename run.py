@@ -7,6 +7,7 @@ import threading
 import listener
 import time
 
+log.start('tracker')
 conn = database.connect()
 shutdown = threading.Event()
 
