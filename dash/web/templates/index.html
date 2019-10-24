@@ -1,25 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ page }} EDFT</title>
-</head>
-<body>
-    <div id="header">
-        <span style="font-size: 30px;">
-            Elite: Dangerous Faction Tracker
-        </span>
-        <span style="font-size:14px;">
-            BY CMDR HAELNORR --- version  {{ version }}
-        </span>
-    </div>
+{% extends "base.html" %}
+{% block content %}
+<div>
+    {% for alert in alerts %}
     <div>
-        {% for alert in alerts %}
-        <div>
-            <p>{{ alert }}</p>
-        </div>
-        {% endfor %}
-        </p>
+        <p>{{ alert }}</p>
     </div>
-</body>
-</html>
+    {% endfor %}
+    </p>
+</div>
+{% endblock %}

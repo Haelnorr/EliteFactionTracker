@@ -147,7 +147,8 @@ def get_faction(faction):
     faction_db = database.fetch_faction(__conn, faction)
     presence_db = database.fetch_presence(__conn, fac_id=faction_db.faction_id)
 
-    results = []
+    results = [faction_db.name]
+    sys_results = []
     for presence in presence_db:
         system = database.fetch_system(__conn, presence.system_id)
         states = []
@@ -176,8 +177,8 @@ def get_faction(faction):
             states,
             update
         )
-        results.append(row)
-
+        sys_results.append(row)
+    results.append(sys_results)
     return results
 
 

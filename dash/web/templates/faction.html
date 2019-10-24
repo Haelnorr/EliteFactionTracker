@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div>
+    <h2>{{ faction }}</h2>
+    <table border="4px">
+        <tr>
+            <td>System</td>
+            <td>Influence</td>
+            <td>States</td>
+            <td>Last Updated</td>
+        </tr>
+        {% for system in systems %}
+        <tr>
+            <td>{{ system[0] }}</td>
+            <td>{{ system[1] }}</td>
+            <td>{{ system[2] }}</td>
+            <td>{{ system[3] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}
