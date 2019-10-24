@@ -1,5 +1,4 @@
 import database
-from operator import itemgetter
 from datetime import datetime
 import atexit
 from math import floor
@@ -73,11 +72,16 @@ def get_alerts():
 
 
 def get_system(system):
+    """
+    Get all relevant data on a system from the database
+    :param system: name or ID of the system
+    :return: Tuple with: list of factions sorted by influence, list of conflicts
+    """
     system_db = database.fetch_system(__conn, system)
 
     presence_db = database.fetch_presence(__conn, sys_id=system_db.system_id)
 
-    results = []
+    sys_results = []
     for presence in presence_db:
         faction = database.fetch_faction(__conn, presence.faction_id)
 
@@ -87,13 +91,28 @@ def get_system(system):
         except TypeError:
             home_system = home_system_id
 
-        expansion = False
+        expansion = None
         if faction.expansion is 1:
-            expansion = True
+            try:
+                expansion_db = database.fetch_expansion(__conn, faction.faction_id)
+                expansion = expansion_db.stage
+            except TypeError:
+                pass
 
-        conflict = False
+        conflict = None
         if faction.conflict_flags is not 0:
-            conflict = True
+            try:
+                conflict_db = database.fetch_conflict(__conn, sys_id=system_db.system_id, fac_name=faction.name)
+                conflict = conflict_db.stage
+            except TypeError:
+                pass
+
+        retreat = None
+        try:
+            retreat_db = database.fetch_retreat(__conn, fac_id=presence.faction_id, sys_id=system_db.system_id)
+            retreat = retreat_db.stage
+        except TypeError:
+            pass
 
         update = time_since(presence.updated_at)
 
@@ -105,10 +124,59 @@ def get_system(system):
             home_system,
             expansion,
             conflict,
+            retreat,
+            update
+        )
+        sys_results.append(row)
+
+    conflicts = database.fetch_conflict(__conn, sys_id=system_db.system_id)
+
+    results = (
+        sys_results,
+        conflicts
+    )
+    return results
+
+
+def get_faction(faction):
+    """
+    Gets all relevant data on a faction
+    :param faction: the name or ID of the faction
+    :return: Tuple with: list of faction data
+    """
+    faction_db = database.fetch_faction(__conn, faction)
+    presence_db = database.fetch_presence(__conn, fac_id=faction_db.faction_id)
+
+    results = []
+    for presence in presence_db:
+        system = database.fetch_system(__conn, presence.system_id)
+        states = []
+        if faction_db.conflict_flags is not 0:
+            try:
+                conflict = database.fetch_conflict(__conn, sys_id=system.system_id, fac_name=faction_db.name)
+                states.append('Conflict ({})'.format(conflict.stage))
+            except TypeError:
+                pass
+        if faction_db.expansion is not 0:
+            try:
+                expansion = database.fetch_expansion(__conn, faction_db.faction_id)
+                states.append('Expansion ({})'.format(expansion.stage))
+            except TypeError:
+                pass
+        try:
+            retreat = database.fetch_retreat(__conn, fac_id=faction_db.faction_id, sys_id=system.system_id)
+            states.append('Retreat ({})'.format(retreat.stage))
+        except TypeError:
+            pass
+        update = time_since(presence.updated_at)
+        influence = str(round(presence.influence[0]*100, 1)) + '%'
+        row = (
+            system.name,
+            influence,
+            states,
             update
         )
         results.append(row)
-    sorted(results, key=itemgetter(1))
 
     return results
 
