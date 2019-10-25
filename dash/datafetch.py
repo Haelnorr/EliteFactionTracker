@@ -3,6 +3,7 @@ from datetime import datetime
 import atexit
 from math import floor
 from calendar import monthrange
+import classes
 
 __conn = database.connect()
 
@@ -75,7 +76,7 @@ def get_system(system):
     """
     Get all relevant data on a system from the database
     :param system: name or ID of the system
-    :return: Tuple with: list of factions sorted by influence, list of conflicts
+    :return: system name, list of factions, list of conflicts
     """
     system_db = database.fetch_system(__conn, system)
 
@@ -120,17 +121,18 @@ def get_system(system):
 
         update = time_since(presence.updated_at)
 
-        row = (
-            faction.name,
-            str(round(presence.influence[0]*100, 1)) + '%',
-            str(round(presence.influence[1]*100, 1)) + '%',
-            str(round(presence.influence[2]*100, 1)) + '%',
-            home_system,
-            expansion,
-            conflict,
-            retreat,
-            update
-        )
+        row = {
+            'id': faction.faction_id,
+            'name': faction.name,
+            'influence1': str(round(presence.influence[0]*100, 1)) + '%',
+            'influence2': str(round(presence.influence[1]*100, 1)) + '%',
+            'influence3': str(round(presence.influence[2]*100, 1)) + '%',
+            'home_system': home_system,
+            'expansion': expansion,
+            'conflict': conflict,
+            'retreat': retreat,
+            'updated': update
+        }
         sys_results.append(row)
 
     conflicts = database.fetch_conflict(__conn, sys_id=system_db.system_id)
@@ -140,11 +142,33 @@ def get_system(system):
     return results
 
 
+def get_all_systems():
+    """
+    Gets a list of all systems
+    :return: system name, ID and number of factions as a list of dicts
+    """
+    sql = 'SELECT * FROM System'
+    systems = database.query(__conn, sql)
+    results = []
+    for system in systems:
+        system = classes.System(system)
+        faction_count = len(database.fetch_presence(__conn, sys_id=system.system_id))
+        updated = time_since(system.updated_at)
+        data = {
+            'name': system.name,
+            'id': system.system_id,
+            'num_factions': faction_count,
+            'updated': updated
+        }
+        results.append(data)
+    return results
+
+
 def get_faction(faction):
     """
     Gets all relevant data on a faction
     :param faction: the name or ID of the faction
-    :return: Tuple with: list of faction data
+    :return: faction name and list of systems the faction is in
     """
     faction_db = database.fetch_faction(__conn, faction)
     presence_db = database.fetch_presence(__conn, fac_id=faction_db.faction_id)
@@ -173,15 +197,40 @@ def get_faction(faction):
             pass
         update = time_since(presence.updated_at)
         influence = str(round(presence.influence[0]*100, 1)) + '%'
-        row = (
-            system.name,
-            influence,
-            states,
-            update
-        )
+        row = {
+            'id': system.system_id,
+            'name': system.name,
+            'influence': influence,
+            'states': states,
+            'updated': update,
+        }
         sys_results.append(row)
     results.append(sys_results)
     return results
+
+
+def get_all_factions():
+    """
+    Gets a list of all factions
+    :return: two list of factions: master factions and child factions
+    """
+    sql = 'SELECT * FROM Faction'
+    factions = database.query(__conn, sql)
+    master = []
+    child = []
+    for faction in factions:
+        faction = classes.Faction(faction)
+        update = time_since(faction.updated_at)
+        data = {
+            'id': faction.faction_id,
+            'name': faction.name,
+            'updated': update
+        }
+        if faction.master is 0:
+            master.append(data)
+        else:
+            child.append(data)
+    return master, child
 
 
 def time_since(timestamp):

@@ -2,7 +2,8 @@
 
 {% block content %}
 <div>
-    <h2>{{ faction }}</h2>
+    {% if faction == True %}
+    <h2>{{ data[0] }}</h2>
     <table border="1px">
         <tr>
             <td>System</td>
@@ -10,14 +11,42 @@
             <td>States</td>
             <td>Last Updated</td>
         </tr>
-        {% for system in systems %}
+        {% for system in data[1] %}
         <tr>
-            <td>{{ system[0] }}</td>
-            <td>{{ system[1] }}</td>
-            <td>{{ system[2] }}</td>
-            <td>{{ system[3] }}</td>
+            <td><a href='/systems/{{ system["id"] }}'>{{ system["name"] }}</a></td>
+            <td>{{ system["influence"] }}</td>
+            <td>{{ system["states"] }}</td>
+            <td>{{ system["updated"] }}</td>
         </tr>
         {% endfor %}
     </table>
+    {% else %}
+    <h2>Tracked Factions</h2>
+    <table border="1px">
+        <tr>
+            <td>Faction</td>
+            <td>Last Updated</td>
+        </tr>
+        {% for faction in data[0] %}
+        <tr>
+            <td><a href='/factions/{{ faction["id"] }}'>{{ faction["name"] }}</a></td>
+            <td>{{ faction["updated"] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <h2>Secondary Factions</h2>
+    <table border="1px">
+        <tr>
+            <td>Faction</td>
+            <td>Last Updated</td>
+        </tr>
+        {% for faction in data[1] %}
+        <tr>
+            <td><a href='/factions/{{ faction["id"] }}'>{{ faction["name"] }}</a></td>
+            <td>{{ faction["updated"] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
 </div>
 {% endblock %}

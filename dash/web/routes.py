@@ -12,16 +12,25 @@ def index():
     return render_template('index.html', page='Dashboard', version=VERSION, alerts=alerts)
 
 
-@dash_app.route('/faction/<fac_id>')
-def faction(fac_id):
-    faction_data = datafetch.get_faction(fac_id)
-    faction_name = faction_data[0]
-    systems = faction_data[1]
+@dash_app.route('/factions')
+@dash_app.route('/factions/<fac_id>')
+def faction(fac_id=None):
+    if fac_id is not None:
+        faction_data = datafetch.get_faction(fac_id)
+        template = render_template('faction.html', page='Factions', version=VERSION, faction=True, data=faction_data)
+    else:
+        factions = datafetch.get_all_factions()
+        template = render_template('faction.html', page='Factions', version=VERSION, faction=False, data=factions)
+    return template
 
-    return render_template('faction.html', page='Faction', version=VERSION, faction=faction_name, systems=systems)
 
-
-@dash_app.route('/system/<sys_id>')
-def system(sys_id):
-    system_data = datafetch.get_system(sys_id)
-    return render_template('system.html', page='System', version=VERSION, system=system_data)
+@dash_app.route('/systems')
+@dash_app.route('/systems/<sys_id>')
+def system(sys_id=None):
+    if sys_id is not None:
+        system_data = datafetch.get_system(sys_id)
+        template = render_template('system.html', page='Systems', version=VERSION, system=True, data=system_data)
+    else:
+        systems = datafetch.get_all_systems()
+        template = render_template('system.html', page='Systems', version=VERSION, system=False, data=systems)
+    return template

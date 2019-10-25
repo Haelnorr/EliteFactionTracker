@@ -2,7 +2,8 @@
 
 {% block content %}
 <div>
-    <h2>{{ system[0] }}</h2>
+    {% if system == True %}
+    <h2>{{ data[0] }}</h2>
     <table border="1px">
         <tr>
             <td>Faction</td>
@@ -13,15 +14,15 @@
             <td>Retreat</td>
             <td>Last Updated</td>
         </tr>
-        {% for faction in system[1] %}
+        {% for faction in data[1] %}
         <tr>
-            <td>{{ faction[0] }}</td>
-            <td>{{ faction[1] }}</td>
-            <td>{{ faction[4]['name'] }}</td>
-            <td>{{ faction[5] }}</td>
-            <td>{{ faction[6] }}</td>
-            <td>{{ faction[7] }}</td>
-            <td>{{ faction[8] }}</td>
+            <td><a href='/factions/{{ faction["id"] }}'>{{ faction["name"] }}</a></td>
+            <td>{{ faction["influence1"] }}</td>
+            <td><a href='/systems/{{ faction["home_system"]["id"] }}'>{{ faction["home_system"]["name"] }}</a></td>
+            <td>{{ faction["expansion"] }}</td>
+            <td>{{ faction["conflict"] }}</td>
+            <td>{{ faction["retreat"] }}</td>
+            <td>{{ faction["updated"] }}</td>
         </tr>
         {% endfor %}
     </table>
@@ -36,7 +37,7 @@
             <td>Started on</td>
             <td>Last Updated</td>
         </tr>
-        {% for conflict in system[2] %}
+        {% for conflict in data[2] %}
         <tr>
             <td>{{ conflict.faction_name_1 }}<br>{{ conflict.faction_stake_1 }}</td>
             <td>{{ conflict.faction_score_1 }}</td>
@@ -48,5 +49,22 @@
         </tr>
         {% endfor %}
     </table>
+    {% else %}
+    <h2>Tracked Systems</h2>
+    <table border="1px">
+        <tr>
+            <td>System</td>
+            <td>Number of Factions</td>
+            <td>Last Updated</td>
+        </tr>
+        {% for sys in data %}
+        <tr>
+            <td><a href='/systems/{{ sys["id"] }}'>{{ sys["name"] }}</a></td>
+            <td>{{ sys["num_factions"] }}</td>
+            <td>{{ sys["updated"] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
 </div>
 {% endblock %}
