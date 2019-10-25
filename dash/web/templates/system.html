@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div>
+    <h2>{{ system[0] }}</h2>
+    <table border="1px">
+        <tr>
+            <td>Faction</td>
+            <td>Influence</td>
+            <td>Home System</td>
+            <td>Expansion</td>
+            <td>Conflict</td>
+            <td>Retreat</td>
+            <td>Last Updated</td>
+        </tr>
+        {% for faction in system[1] %}
+        <tr>
+            <td>{{ faction[0] }}</td>
+            <td>{{ faction[1] }}</td>
+            <td>{{ faction[4]['name'] }}</td>
+            <td>{{ faction[5] }}</td>
+            <td>{{ faction[6] }}</td>
+            <td>{{ faction[7] }}</td>
+            <td>{{ faction[8] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <h2>Conflicts</h2>
+    <table border="1px">
+        <tr>
+            <td>Faction 1</td>
+            <td>Score</td>
+            <td>Score</td>
+            <td>Faction 2</td>
+            <td>Stage</td>
+            <td>Started on</td>
+            <td>Last Updated</td>
+        </tr>
+        {% for conflict in system[2] %}
+        <tr>
+            <td>{{ conflict.faction_name_1 }}<br>{{ conflict.faction_stake_1 }}</td>
+            <td>{{ conflict.faction_score_1 }}</td>
+            <td>{{ conflict.faction_score_2 }}<br>{{ conflict.faction_stake_2 }}</td>
+            <td>{{ conflict.faction_name_2 }} </td>
+            <td>{{ conflict.stage }}</td>
+            <td>{{ conflict.date_started }}</td>
+            <td>{{ conflict.updated_at }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

@@ -81,15 +81,19 @@ def get_system(system):
 
     presence_db = database.fetch_presence(__conn, sys_id=system_db.system_id)
 
+    results = [system_db.name]
     sys_results = []
     for presence in presence_db:
         faction = database.fetch_faction(__conn, presence.faction_id)
 
-        home_system_id = faction.home_system_id
+        home_system = {
+            'id': faction.home_system_id
+        }
         try:
-            home_system = database.fetch_system(__conn, home_system_id).system_id
+            home_system_db = database.fetch_system(__conn, home_system['id'])
+            home_system['name'] = home_system_db.name
         except TypeError:
-            home_system = home_system_id
+            pass
 
         expansion = None
         if faction.expansion is 1:
@@ -131,10 +135,8 @@ def get_system(system):
 
     conflicts = database.fetch_conflict(__conn, sys_id=system_db.system_id)
 
-    results = (
-        sys_results,
-        conflicts
-    )
+    results.append(sys_results)
+    results.append(conflicts)
     return results
 
 

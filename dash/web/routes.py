@@ -19,3 +19,9 @@ def faction(fac_id):
     systems = faction_data[1]
 
     return render_template('faction.html', page='Faction', version=VERSION, faction=faction_name, systems=systems)
+
+
+@dash_app.route('/system/<sys_id>')
+def system(sys_id):
+    system_data = datafetch.get_system(sys_id)
+    return render_template('system.html', page='System', version=VERSION, system=system_data)
