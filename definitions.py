@@ -1,4 +1,4 @@
 import os.path
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-VERSION = '0.5.15'
+VERSION = '0.5.16'

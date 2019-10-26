@@ -1,10 +1,10 @@
 import queue
 import concurrent.futures
-import log
-import database
-import bgsapi
+from . import log
+from . import database
+from . import bgsapi
 import threading
-import listener
+from . import listener
 import time
 
 log.start('tracker')
