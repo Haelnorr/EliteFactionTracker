@@ -106,7 +106,7 @@ def process_data(system_db, message):
                 faction_db = database.fetch_faction(db_conn, faction_name)
 
                 presence_db = database.fetch_presence(db_conn, sys_id=system_db.system_id, fac_id=faction_db.faction_id)
-                if influence not in presence_db.influence:
+                if not influence == presence_db.influence[1] or not influence == presence_db.influence[2]:
                     cached = False
 
                 if faction_db.master is 0:
