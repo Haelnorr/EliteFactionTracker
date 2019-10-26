@@ -1,3 +1,3 @@
-import log
+from .. import log
 log.start('dashboard')
-from dash.web import dash_app
+from .web import dash_app

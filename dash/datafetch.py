@@ -1,9 +1,9 @@
-import database
+from .. import database
 from datetime import datetime
 import atexit
 from math import floor
 from calendar import monthrange
-import classes
+from .. import classes
 
 __conn = database.connect()
 

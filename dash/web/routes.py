@@ -1,7 +1,7 @@
 from flask import render_template
-from dash.web import dash_app
-from definitions import VERSION
-from dash import datafetch
+from . import dash_app
+from ...definitions import VERSION
+from .. import datafetch
 
 
 @dash_app.route('/')
