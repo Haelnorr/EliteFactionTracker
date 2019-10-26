@@ -1,8 +1,8 @@
 from datetime import datetime
 from urllib import parse
 from requests import get
-import database
-import log
+from . import database
+from . import log
 
 __API_DATE_FMT = '%Y-%m-%dT%H:%M:%S.000Z'
 
@@ -213,46 +213,46 @@ def new_faction(faction_name):
         except database.sqlite3.IntegrityError:
             log.info('Expansion already in database: ' + _faction['name'])
 
-        # process secondary faction data
-        for __faction in _secondary_factions:
-            _secondary_faction = faction(__faction)
-            timestamp = datetime.strftime(datetime.strptime(_secondary_faction['updated_at'], __API_DATE_FMT), database.DATETIME_FMT)
-            # enter secondary faction into database
-            secondary_faction_entry = (
-                _secondary_faction['id'],
-                _secondary_faction['name'],
-                _secondary_faction['home_system_id'],
-                timestamp,
-                _faction['id']
-            )
-            try:
-                database.new_faction(__conn, secondary_faction_entry)
-                log.info('Faction entered into database: ' + _secondary_faction['name'])
-            except database.sqlite3.IntegrityError:
-                log.info('Faction already in database: ' + _secondary_faction['name'])
+    # process secondary faction data
+    for __faction in _secondary_factions:
+        _secondary_faction = faction(__faction)
+        timestamp = datetime.strftime(datetime.strptime(_secondary_faction['updated_at'], __API_DATE_FMT), database.DATETIME_FMT)
+        # enter secondary faction into database
+        secondary_faction_entry = (
+            _secondary_faction['id'],
+            _secondary_faction['name'],
+            _secondary_faction['home_system_id'],
+            timestamp,
+            _faction['id']
+        )
+        try:
+            database.new_faction(__conn, secondary_faction_entry)
+            log.info('Faction entered into database: ' + _secondary_faction['name'])
+        except database.sqlite3.IntegrityError:
+            log.info('Faction already in database: ' + _secondary_faction['name'])
 
-            # faction presence
-            for system in _secondary_faction['presence']:
+        # faction presence
+        for system in _secondary_faction['presence']:
+            try:
+                log.info('Looking up system in the database: %s' % system['system_name'])
+                _query = 'SELECT system_id FROM System WHERE name=?'
+                _system_id = database.query(__conn, _query, ("%s" % system['system_name'],))[0][0]
+                presence_entry = (
+                    _system_id,
+                    _secondary_faction['id'],
+                    system['influence'],
+                    system['influence'],
+                    system['influence'],
+                    timestamp
+                )
+                # store data
                 try:
-                    log.info('Looking up system in the database: %s' % system['system_name'])
-                    _query = 'SELECT system_id FROM System WHERE name=?'
-                    _system_id = database.query(__conn, _query, ("%s" % system['system_name'],))[0][0]
-                    presence_entry = (
-                        _system_id,
-                        _secondary_faction['id'],
-                        system['influence'],
-                        system['influence'],
-                        system['influence'],
-                        timestamp
-                    )
-                    # store data
-                    try:
-                        database.new_presence(__conn, presence_entry)
-                        log.info('Presence entered into database: ' + _secondary_faction['name'] + ', ' + system['system_name'])
-                    except database.sqlite3.IntegrityError:
-                        log.info('Presence already in database: ' + _secondary_faction['name'] + ', ' + system['system_name'])
-                except IndexError:
-                    log.info('System not tracked, ignoring: %s' % system['system_name'])
+                    database.new_presence(__conn, presence_entry)
+                    log.info('Presence entered into database: ' + _secondary_faction['name'] + ', ' + system['system_name'])
+                except database.sqlite3.IntegrityError:
+                    log.info('Presence already in database: ' + _secondary_faction['name'] + ', ' + system['system_name'])
+            except IndexError:
+                log.info('System not tracked, ignoring: %s' % system['system_name'])
 
     __conn.close()  # close local database connection before exiting function
 

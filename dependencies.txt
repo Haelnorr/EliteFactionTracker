@@ -1,0 +1,5 @@
+requests
+zmq
+simplejson
+gunicorn
+flask

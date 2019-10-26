@@ -3,9 +3,9 @@ import zmq
 import simplejson
 import sys
 import time
-import bgsapi
-import database
-import log
+from . import bgsapi
+from . import database
+from . import log
 from datetime import datetime
 
 # config

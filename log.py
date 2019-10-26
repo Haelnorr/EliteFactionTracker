@@ -1,5 +1,5 @@
 import logging
-from definitions import ROOT_DIR
+from .definitions import ROOT_DIR
 from datetime import datetime
 from os import path
 

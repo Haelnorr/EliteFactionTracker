@@ -1,9 +1,9 @@
 import sqlite3
 from sqlite3 import Error
 import os.path
-import classes
-import log
-from definitions import ROOT_DIR
+from . import classes
+from . import log
+from .definitions import ROOT_DIR
 
 DATETIME_FMT = '%Y-%m-%d %H:%M:%S'
 
