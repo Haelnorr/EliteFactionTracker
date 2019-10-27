@@ -94,7 +94,7 @@ def get_system(system):
             home_system_db = database.fetch_system(__conn, home_system['id'])
             home_system['name'] = home_system_db.name
         except TypeError:
-            pass
+            home_system['name'] = None
 
         expansion = None
         if faction.expansion is 1:
@@ -135,9 +135,11 @@ def get_system(system):
         }
         sys_results.append(row)
 
+    systems_sorted = sorted(sys_results, key=lambda f: float(f['influence1'].strip('%')), reverse=True)
+
     conflicts = database.fetch_conflict(__conn, sys_id=system_db.system_id)
 
-    results.append(sys_results)
+    results.append(systems_sorted)
     results.append(conflicts)
     return results
 
@@ -205,7 +207,8 @@ def get_faction(faction):
             'updated': update,
         }
         sys_results.append(row)
-    results.append(sys_results)
+    systems_sorted = sorted(sys_results, key=lambda f: float(f['influence'].strip('%')), reverse=True)
+    results.append(systems_sorted)
     return results
 
 

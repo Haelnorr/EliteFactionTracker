@@ -101,8 +101,9 @@ def process_data(system_db, message):
     for faction in message['Factions']:
         influence = faction['Influence']
         faction_name = faction['Name']
+        # exclude pilots fed local branch (present in all systems)
         if 'Pilots\' Federation Local Branch' not in faction_name:
-            try:
+            try:    # attempt to pull the faction from the database
                 faction_db = database.fetch_faction(db_conn, faction_name)
 
                 presence_db = database.fetch_presence(db_conn, sys_id=system_db.system_id, fac_id=faction_db.faction_id)
@@ -110,11 +111,11 @@ def process_data(system_db, message):
                     cached = False
 
                 if faction_db.master is 0:
-                    master = faction_db.master
+                    master = faction_db.faction_id
 
                 # group old and new data together and add to list
                 factions.append((faction, faction_db, presence_db))
-            except TypeError:
+            except TypeError:   # faction wasn't in the database
                 log.debug('Faction not tracked: %s' % faction_name)
 
                 # add to list with 'False' flag to indicate its not tracked

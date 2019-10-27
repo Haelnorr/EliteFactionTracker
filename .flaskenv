@@ -1,1 +1,1 @@
-FLASK_APP=dash\dashboard.py
+FLASK_APP=wsgi.py

@@ -18,7 +18,11 @@
         <tr>
             <td><a href='/factions/{{ faction["id"] }}'>{{ faction["name"] }}</a></td>
             <td>{{ faction["influence1"] }}</td>
+            {% if faction["home_system"]["name"] == None %}
+            <td>Not tracked</td>
+            {% else %}
             <td><a href='/systems/{{ faction["home_system"]["id"] }}'>{{ faction["home_system"]["name"] }}</a></td>
+            {% endif %}
             <td>{{ faction["expansion"] }}</td>
             <td>{{ faction["conflict"] }}</td>
             <td>{{ faction["retreat"] }}</td>
