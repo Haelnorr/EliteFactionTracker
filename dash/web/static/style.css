@@ -51,26 +51,77 @@ body {
 }
 
 #nav {
-  height: 39px;
-  margin: 0px;
-  padding-left: 5px;
-  background-color: #1c1c1c;
+    height: 39px;
+    margin: 0px;
+    padding-left: 5px;
+    background-color: #1c1c1c;
 }
 
 #nav a:link, a:visited {
-  background-color: #1c1c1c;
-  color: #e3e3e3;
-  padding: 10px 15px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
+    background-color: #1c1c1c;
+    color: #e3e3e3;
+    padding: 10px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
 }
 
 #nav a:hover {
-  background-color: #212121;
+    background-color: #212121;
 }
 
 #main {
-  height: 100%;
-  padding: 30px;
+    height: 100%;
+    padding: 30px;
+}
+
+
+.faction-tile {
+    padding: 15px;
+    text-align: center;
+    vertical-align: middle;
+    border: 2px solid dark-gray;
+    border-radius: 5px;
+    background-color: #2f2f2f;
+    width: 150px;
+}
+
+
+.faction-tile a:link, a:visited {
+    color: #e3e3e3;
+}
+
+
+.faction-table, .system-table, .conflict-table {
+    width: 80%;
+    background-color: #333333;
+    border: 2px solid black;
+    border-collapse: collapse;
+}
+
+.title-row{
+  margin: 0;
+}
+
+.title-row td {
+    background-color: #bb5500;
+    padding-left: 5px;
+    border-right: 2px solid black;
+}
+
+.content-row:nth-child(even) {
+    background-color: #444444;
+}
+
+.content-row {
+    border-bottom: 1px solid gray;
+}
+
+.content-row td {
+    border-right: 2px solid black;
+    padding: 5px;
+}
+
+.content-row td a:link, a:visited {
+    color: #e3e3e3;
 }

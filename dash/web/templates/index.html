@@ -11,7 +11,7 @@
     {% endif %}
     <h4>Tracked Factions</h4>
     {% for faction in factions %}
-    <div class="faction-tile">{{ faction['name'] }}</div>
+    <div class="faction-tile"><a href='/faction/{{ faction["id"] }}'>{{ faction["name"] }}</a></div>
     {% endfor %}
 </div>
 {% endblock %}

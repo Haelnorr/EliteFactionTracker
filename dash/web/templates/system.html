@@ -4,8 +4,8 @@
 <div>
     {% if system == True %}
     <h2>{{ data[0] }}</h2>
-    <table border="1px">
-        <tr>
+    <table class="system-table">
+        <tr class="title-row">
             <td>Faction</td>
             <td>Influence</td>
             <td>Home System</td>
@@ -15,7 +15,7 @@
             <td>Last Updated</td>
         </tr>
         {% for faction in data[1] %}
-        <tr>
+        <tr class="content-row">
             <td><a href='/faction/{{ faction["id"] }}'>{{ faction["name"] }}</a></td>
             <td>{{ faction["influence1"] }}</td>
             {% if faction["home_system"]["name"] == None %}
@@ -31,8 +31,11 @@
         {% endfor %}
     </table>
     <h2>Conflicts</h2>
-    <table border="1px">
-        <tr>
+    {% if data[2]|length == 0 %}
+    <p>There are no conflicts to show</p>
+    {% else %}
+    <table class="conflict-table">
+        <tr class="title-row">
             <td>Faction 1</td>
             <td>Score</td>
             <td>Score</td>
@@ -42,7 +45,7 @@
             <td>Last Updated</td>
         </tr>
         {% for conflict in data[2] %}
-        <tr>
+        <tr class="content-row">
             <td>{{ conflict.faction_name_1 }}<br>{{ conflict.faction_stake_1 }}</td>
             <td>{{ conflict.faction_score_1 }}</td>
             <td>{{ conflict.faction_score_2 }}<br>{{ conflict.faction_stake_2 }}</td>
@@ -53,16 +56,17 @@
         </tr>
         {% endfor %}
     </table>
+    {% endif %}
     {% else %}
     <h2>Tracked Systems</h2>
-    <table border="1px">
-        <tr>
+    <table class="system-table">
+        <tr class="title-row">
             <td>System</td>
             <td>Number of Factions</td>
             <td>Last Updated</td>
         </tr>
         {% for sys in data %}
-        <tr>
+        <tr class="content-row">
             <td><a href='/system/{{ sys["id"] }}'>{{ sys["name"] }}</a></td>
             <td>{{ sys["num_factions"] }}</td>
             <td>{{ sys["updated"] }}</td>
