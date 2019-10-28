@@ -1,11 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
 <div>
-    {% for alert in alerts %}
-    <div>
-        <p>{{ alert }}</p>
-    </div>
+    <h2>Dashboard</h2>
+    {% if alert_count == 0 %}
+    <h5>There are no alerts</h5>
+    {% elif alert_count == 1 %}
+    <h5>There is 1 alert. View details in the 'Alerts' tab</h5>
+    {% else %}
+    <h5>There are {{ alert_count }} alerts. View details in the 'Alerts' tab</h5>
+    {% endif %}
+    <h4>Tracked Factions</h4>
+    {% for faction in factions %}
+    <div class="faction-tile">{{ faction['name'] }}</div>
     {% endfor %}
-    </p>
 </div>
 {% endblock %}

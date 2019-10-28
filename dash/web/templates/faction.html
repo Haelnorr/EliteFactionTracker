@@ -13,7 +13,7 @@
         </tr>
         {% for system in data[1] %}
         <tr>
-            <td><a href='/systems/{{ system["id"] }}'>{{ system["name"] }}</a></td>
+            <td><a href='/system/{{ system["id"] }}'>{{ system["name"] }}</a></td>
             <td>{{ system["influence"] }}</td>
             <td>{{ system["states"] }}</td>
             <td>{{ system["updated"] }}</td>
@@ -29,7 +29,7 @@
         </tr>
         {% for faction in data[0] %}
         <tr>
-            <td><a href='/factions/{{ faction["id"] }}'>{{ faction["name"] }}</a></td>
+            <td><a href='/faction/{{ faction["id"] }}'>{{ faction["name"] }}</a></td>
             <td>{{ faction["updated"] }}</td>
         </tr>
         {% endfor %}
@@ -42,7 +42,7 @@
         </tr>
         {% for faction in data[1] %}
         <tr>
-            <td><a href='/factions/{{ faction["id"] }}'>{{ faction["name"] }}</a></td>
+            <td><a href='/faction/{{ faction["id"] }}'>{{ faction["name"] }}</a></td>
             <td>{{ faction["updated"] }}</td>
         </tr>
         {% endfor %}

@@ -16,12 +16,12 @@
         </tr>
         {% for faction in data[1] %}
         <tr>
-            <td><a href='/factions/{{ faction["id"] }}'>{{ faction["name"] }}</a></td>
+            <td><a href='/faction/{{ faction["id"] }}'>{{ faction["name"] }}</a></td>
             <td>{{ faction["influence1"] }}</td>
             {% if faction["home_system"]["name"] == None %}
             <td>Not tracked</td>
             {% else %}
-            <td><a href='/systems/{{ faction["home_system"]["id"] }}'>{{ faction["home_system"]["name"] }}</a></td>
+            <td><a href='/system/{{ faction["home_system"]["id"] }}'>{{ faction["home_system"]["name"] }}</a></td>
             {% endif %}
             <td>{{ faction["expansion"] }}</td>
             <td>{{ faction["conflict"] }}</td>
@@ -63,7 +63,7 @@
         </tr>
         {% for sys in data %}
         <tr>
-            <td><a href='/systems/{{ sys["id"] }}'>{{ sys["name"] }}</a></td>
+            <td><a href='/system/{{ sys["id"] }}'>{{ sys["name"] }}</a></td>
             <td>{{ sys["num_factions"] }}</td>
             <td>{{ sys["updated"] }}</td>
         </tr>

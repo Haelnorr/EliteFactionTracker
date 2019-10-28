@@ -212,6 +212,26 @@ def get_faction(faction):
     return results
 
 
+def get_tracked_factions():
+    """
+    Gets a list of all master factions
+    :return: a list of factions
+    """
+    sql = 'SELECT * FROM Faction WHERE master=0'
+    factions = database.query(__conn, sql)
+    result = []
+    for faction in factions:
+        faction = classes.Faction(faction)
+        update = time_since(faction.updated_at)
+        data = {
+            'id': faction.faction_id,
+            'name': faction.name,
+            'updated': update
+        }
+        result.append(data)
+    return result
+
+
 def get_all_factions():
     """
     Gets a list of all factions

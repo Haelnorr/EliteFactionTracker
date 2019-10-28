@@ -4,22 +4,25 @@
     <meta charset="UTF-8">
     <title>{{ page }} - EDFT</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='icon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div id="header">
-        <span style="font-size: 30px;">
-            Elite: Dangerous Faction Tracker
-        </span>
-        <span style="font-size:14px;">
-            BY CMDR HAELNORR --- version  {{ version }}
-        </span>
+    <div id="title">
+        <div id="title-left">
+            <span>Elite: Dangerous Faction Tracker</span>
+        </div>
+        <div id="title-right">
+            <span>BY CMDR HAELNORR<br>version  {{ version }}</span>
+        </div>
     </div>
     <div id="nav">
-        <a href="/dashboard"><span>Dashboard</span></a>
-        <a href="/systems"><span>Systems</span></a>
-        <a href="/factions"><span>Factions</span></a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/system">Systems</a>
+        <a href="/faction">Factions</a>
+        <a href="/alerts">Alerts</a>
     </div>
-    <hr>
+    <div id="main">
     {% block content %}{% endblock %}
+    </div>
 </body>
 </html>
