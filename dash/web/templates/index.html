@@ -2,16 +2,33 @@
 {% block content %}
 <div>
     <h2>Dashboard</h2>
-    {% if alert_count == 0 %}
-    <h5>There are no alerts</h5>
-    {% elif alert_count == 1 %}
-    <h5>There is 1 alert. View details in the 'Alerts' tab</h5>
-    {% else %}
-    <h5>There are {{ alert_count }} alerts. View details in the 'Alerts' tab</h5>
-    {% endif %}
     <h4>Tracked Factions</h4>
     {% for faction in factions %}
-    <div class="faction-tile"><a href='/faction/{{ faction["id"] }}'>{{ faction["name"] }}</a></div>
+    <div class="faction-tile">
+        <a href='/faction/{{ faction["id"] }}'>{{ faction["name"] }}</a>
+        <span>Systems: {{ faction["systems"] }}</span>
+        <span>Controlling: {{ faction["controlling"] }}</span>
+        <span>Conflicts: {{ faction["conflicts"] }}</span>
+        <span>Expansion: {{ faction["expansion"] }}</span>
+    </div>
     {% endfor %}
+    <h4>Alerts</h4>
+    {% if alert_count[0] == 0 %}
+    <h5>There are no alerts</h5>
+    {% else %}
+    <p>There are {{ alert_count[0] }} alerts for {{ alert_count[1] }} factions</p>
+    {% for faction in alerts %}
+    <div class="alert-block">
+        <h5><a href='/faction/{{ faction["id"] }}'>{{ faction["name"] }}</a></h5>
+            {% for alert in faction["alerts"] %}
+            <div>
+                <div class="alert-{{ alert[1] }}">
+                    {{ alert[0] }}
+                </div>
+            </div>
+            {% endfor %}
+    </div>
+    {% endfor %}
+    {% endif %}
 </div>
 {% endblock %}

@@ -8,10 +8,11 @@ from .. import datafetch
 @dash_app.route('/index')
 @dash_app.route('/dashboard')
 def index():
-    alert_list = datafetch.get_alerts()
-    alert_count = len(alert_list)
+    alert_data = datafetch.get_alerts()
+    alert_list = alert_data[0]
+    alert_count = (alert_data[1], len(alert_list))
     factions = datafetch.get_tracked_factions()
-    return render_template('index.html', page='Dashboard', version=VERSION, alert_count=alert_count, factions=factions)
+    return render_template('index.html', page='Dashboard', version=VERSION, alerts=alert_list, alert_count=alert_count, factions=factions)
 
 
 @dash_app.route('/faction')
@@ -36,9 +37,3 @@ def system(sys_id=None):
         systems = datafetch.get_all_systems()
         template = render_template('system.html', page='Systems', version=VERSION, system=False, data=systems)
     return template
-
-
-@dash_app.route('/alerts')
-def alerts():
-    alert_list = datafetch.get_alerts()
-    return render_template('alerts.html', page='Dashboard', version=VERSION, alerts=alert_list)

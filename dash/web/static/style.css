@@ -1,10 +1,15 @@
 html, body {
     min-height: 100%;
 }
+
 body {
     margin: 0px;
     background-color: #212121;
     font-family: "Fira Sans", "Roboto", "Tahoma", "Calibri", sans-serif;
+    color: #e3e3e3;
+}
+
+a:link, a:visited {
     color: #e3e3e3;
 }
 
@@ -36,7 +41,7 @@ body {
 
 #title-right {
     height: 60px;
-    width: 130px;
+    width: 150px;
     float: right;
     margin: 0px;
 }
@@ -73,22 +78,39 @@ body {
 #main {
     height: 100%;
     padding: 30px;
+    padding-top: 0px;
 }
 
 
 .faction-tile {
-    padding: 15px;
-    text-align: center;
-    vertical-align: middle;
-    border: 2px solid dark-gray;
+    padding: 10px;
+    border: 3px solid #171717;
     border-radius: 5px;
     background-color: #2f2f2f;
-    width: 150px;
+    display: inline-block;
+    min-width: 175px;
 }
 
 
-.faction-tile a:link, a:visited {
-    color: #e3e3e3;
+.faction-tile a {
+    font-weight: bold;
+    margin-top: -5px;
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+    display: block;
+    text-align: center;
+    border-bottom: 2px solid #171717;
+    text-decoration: none;
+}
+
+.faction-tile a:hover {
+    text-decoration: underline;
+}
+
+
+.faction-tile span {
+    text-align: left;
+    display: block;
 }
 
 
@@ -124,4 +146,35 @@ body {
 
 .content-row td a:link, a:visited {
     color: #e3e3e3;
+}
+
+.alert-block {
+    margin-bottom: 30px;
+}
+
+.alert-block div {
+    margin-bottom: 5px;
+}
+
+.alert-warning, .alert-info, .alert-bonus {
+    height: 35px;
+    width: 790px;
+    border-radius: 3px;
+    line-height: 35px;
+    padding-left: 10px;
+    font-weight: 600;
+}
+.alert-warning {
+    background-color: #d12a0d;
+    border: 2px solid #821704;
+}
+
+.alert-info {
+    background-color: #eb9c00;
+    border: 2px solid #966400;
+}
+
+.alert-bonus {
+    background-color: #02a63e;
+    border: 2px solid #00521e;
 }
