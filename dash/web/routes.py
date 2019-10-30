@@ -1,8 +1,8 @@
 from flask import render_template, redirect, flash, url_for, request
-from . import dash_app
+from . import dash_app, db
 from ...definitions import VERSION
 from .. import datafetch
-from .forms import LoginForm
+from .forms import LoginForm, ChangePassword
 from flask_login import current_user, login_user, logout_user, login_required
 from .models import User
 from werkzeug.urls import url_parse
@@ -50,7 +50,9 @@ def system(sys_id=None):
 @dash_app.route('/manage')
 @login_required
 def manage():
-    return redirect(url_for('dashboard'))
+    if current_user.reset_pass is True:
+        return redirect(url_for('change_pass'))
+    return redirect(url_for('dashboard')) # temp while manage under construction
 
 
 @dash_app.route('/manage/login', methods=['GET', 'POST'])
@@ -75,3 +77,20 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('dashboard'))
+
+
+@dash_app.route('/manage/change_pass', methods=['GET', 'POST'])
+@login_required
+def change_pass():
+    form = ChangePassword()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=current_user.username).first()
+        if user is None:
+            flash('Some error occurred, try again and if the problem persists contact the administrator')
+            return redirect(url_for('change_pass'))
+        user.set_password(form.password.data)
+        user.reset_pass = False
+        db.session.add(user)
+        db.session.commit()
+        return redirect(url_for('manage'))
+    return render_template('change_pass.html', page='Change Password', version=VERSION, form=form)
