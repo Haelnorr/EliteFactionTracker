@@ -151,6 +151,14 @@ def get_system(system):
 
     conflicts = database.fetch_conflict(__conn, sys_id=system_db.system_id)
 
+    for conflict in conflicts:
+        conflict.updated_at = time_since(conflict.updated_at)
+        conflict.date_started = datetime.strftime(datetime.strptime(conflict.date_started, database.DATETIME_FMT), '%d/%b/%y')
+        if conflict.faction_stake_1 == '':
+            conflict.faction_stake_1 = 'None'
+        if conflict.faction_stake_2 == '':
+            conflict.faction_stake_2 = 'None'
+
     results.append(systems_sorted)
     results.append(conflicts)
     return results
@@ -182,10 +190,11 @@ def get_faction(faction):
     """
     Gets all relevant data on a faction
     :param faction: the name or ID of the faction
-    :return: faction name and list of systems the faction is in
+    :return: faction name, list of systems the faction is in, list of conflicts
     """
     faction_db = database.fetch_faction(__conn, faction)
     presence_db = database.fetch_presence(__conn, fac_id=faction_db.faction_id)
+    conflict_db = database.fetch_conflict(__conn, fac_name=faction_db.name)
 
     results = [faction_db.name]
     sys_results = []
@@ -221,6 +230,37 @@ def get_faction(faction):
         sys_results.append(row)
     systems_sorted = sorted(sys_results, key=lambda f: float(f['influence'].strip('%')), reverse=True)
     results.append(systems_sorted)
+
+    conflicts = []
+    for conflict in conflict_db:
+        opponent = conflict.faction_name_1
+        days_won = conflict.faction_score_2
+        days_lost = conflict.faction_score_1
+        stake_at_risk = conflict.faction_stake_2
+        stake_to_win = conflict.faction_stake_1
+        if opponent == faction_db.name:
+            opponent = conflict.faction_name_2
+            days_won, days_lost = days_lost, days_won
+            stake_at_risk, stake_to_win = stake_to_win, stake_at_risk
+
+        opponent_db = database.fetch_faction(__conn, opponent)
+        system = database.fetch_system(__conn, conflict.system_id)
+        date_started = datetime.strftime(datetime.strptime(conflict.date_started, database.DATETIME_FMT), '%d/%b/%y')
+        update = time_since(conflict.updated_at)
+        conflict_data = {
+            'system_id': system.system_id,
+            'system_name': system.name,
+            'stake_at_risk': stake_at_risk,
+            'score': '{} - {}'.format(days_won, days_lost),
+            'opponent': opponent,
+            'opponent_id': opponent_db.faction_id,
+            'stake_to_win': stake_to_win,
+            'stage': conflict.stage,
+            'date_started': date_started,
+            'updated_at': update
+        }
+        conflicts.append(conflict_data)
+    results.append(conflicts)
     return results
 
 
