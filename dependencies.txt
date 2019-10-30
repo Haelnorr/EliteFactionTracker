@@ -3,3 +3,4 @@ zmq
 simplejson
 gunicorn
 flask
+flask-wtf

@@ -16,10 +16,20 @@
         </div>
     </div>
     <div id="nav">
-        <a href="/dashboard">Dashboard</a>
-        <a href="/system">Systems</a>
-        <a href="/faction">Factions</a>
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('system') }}">Systems</a>
+        <a href="{{ url_for('faction') }}">Factions</a>
+        <a id="manage" href="{{ url_for('manage') }}">Manage</a>
     </div>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    {% endwith %}
     <div id="main">
     {% block content %}{% endblock %}
     </div>

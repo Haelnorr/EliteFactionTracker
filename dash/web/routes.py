@@ -1,13 +1,18 @@
-from flask import render_template
+from flask import render_template, redirect, flash, url_for
 from . import dash_app
 from ...definitions import VERSION
 from .. import datafetch
+from .forms import LoginForm
+
+
+@dash_app.route('/index')
+@dash_app.route('/dashboard')
+def dash_redirect():
+    return redirect('/')
 
 
 @dash_app.route('/')
-@dash_app.route('/index')
-@dash_app.route('/dashboard')
-def index():
+def dashboard():
     alert_data = datafetch.get_alerts()
     alert_list = alert_data[0]
     alert_count = (alert_data[1], len(alert_list))
@@ -37,3 +42,18 @@ def system(sys_id=None):
         systems = datafetch.get_all_systems()
         template = render_template('system.html', page='Systems', version=VERSION, system=False, data=systems)
     return template
+
+
+@dash_app.route('/manage')
+def manage():
+    return redirect(url_for('login'))
+
+
+@dash_app.route('/manage/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        flash('Login requested for user {}, remember_me={}'.format(
+            form.username.data, form.remember_me.data))
+        return redirect(url_for('dashboard'))
+    return render_template('login.html', title='Sign In', form=form)

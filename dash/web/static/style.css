@@ -60,6 +60,7 @@ a:link, a:visited {
     margin: 0px;
     padding-left: 5px;
     background-color: #1c1c1c;
+    display: flex;
 }
 
 #nav a:link, a:visited {
@@ -73,6 +74,10 @@ a:link, a:visited {
 
 #nav a:hover {
     background-color: #212121;
+}
+
+#nav #manage {
+    margin-left: auto;
 }
 
 #main {
