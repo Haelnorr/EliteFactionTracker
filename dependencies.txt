@@ -4,3 +4,5 @@ simplejson
 gunicorn
 flask
 flask-wtf
+flask-sqlalchemy
+flask-migrate
