@@ -76,8 +76,9 @@ a:link, a:visited {
     background-color: #212121;
 }
 
-#nav #manage {
+#manage {
     margin-left: auto;
+    float: right;
 }
 
 #main {

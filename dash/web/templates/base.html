@@ -19,7 +19,14 @@
         <a href="{{ url_for('dashboard') }}">Dashboard</a>
         <a href="{{ url_for('system') }}">Systems</a>
         <a href="{{ url_for('faction') }}">Factions</a>
-        <a id="manage" href="{{ url_for('manage') }}">Manage</a>
+        <div id="manage">
+        {% if current_user.is_anonymous %}
+        <a href="{{ url_for('manage') }}">Manage</a>
+        {% else %}
+        <a href="{{ url_for('manage') }}">Manage</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+        {% endif %}
+        </div>
     </div>
     {% with messages = get_flashed_messages() %}
         {% if messages %}

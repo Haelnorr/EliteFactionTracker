@@ -1,8 +1,11 @@
-from flask import render_template, redirect, flash, url_for
+from flask import render_template, redirect, flash, url_for, request
 from . import dash_app
 from ...definitions import VERSION
 from .. import datafetch
 from .forms import LoginForm
+from flask_login import current_user, login_user, logout_user, login_required
+from .models import User
+from werkzeug.urls import url_parse
 
 
 @dash_app.route('/index')
@@ -45,15 +48,30 @@ def system(sys_id=None):
 
 
 @dash_app.route('/manage')
+@login_required
 def manage():
-    return redirect(url_for('login'))
+    return redirect(url_for('dashboard'))
 
 
 @dash_app.route('/manage/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('manage'))
     form = LoginForm()
     if form.validate_on_submit():
-        flash('Login requested for user {}, remember_me={}'.format(
-            form.username.data, form.remember_me.data))
-        return redirect(url_for('dashboard'))
-    return render_template('login.html', title='Sign In', form=form)
+        user = User.query.filter_by(username=form.username.data).first()
+        if user is None or not user.check_password(form.password.data):
+            flash('Invalid username or password')
+            return redirect(url_for('login'))
+        login_user(user, remember=form.remember_me.data)
+        next_page = request.args.get('next')
+        if not next_page or url_parse(next_page).netloc != '':
+            next_page = url_for('manage')
+        return redirect(next_page)
+    return render_template('login.html', page='Login', version=VERSION, form=form)
+
+
+@dash_app.route('/manage/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('dashboard'))
