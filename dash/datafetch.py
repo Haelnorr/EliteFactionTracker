@@ -14,29 +14,37 @@ def get_alerts():
     :return: list of alerts
     """
     alerts = []
+    alert_count = 0
 
     factions = database.fetch_faction(__conn)
     # loop through all factions
     for faction in factions:
+        alert_entry = {
+            'id': faction.faction_id,
+            'name': faction.name,
+            'alerts': []
+        }
         presences = database.fetch_presence(__conn, fac_id=faction.faction_id)
-        # do some magic math for conflicts here
         for presence in presences:
             system = database.fetch_system(__conn, presence.system_id)
             # check if faction is in retreat
             try:
                 retreat = database.fetch_retreat(__conn, fac_id=faction.faction_id, sys_id=system.system_id)
                 date_detected = retreat.detected_on.split()[0]
-                alert = '{faction} has {stage} retreat in {system} detected on {detected}'
-                alert = alert.format(faction=faction.name, stage=retreat.stage, system=system.name, detected=date_detected)
-                alerts.append(alert)
+                alert = '{stage} retreat in {system} detected on {detected}'
+                alert = alert.format(stage=retreat.stage, system=system.name, detected=date_detected)
+                alert_entry['alerts'].append((alert, 'warning'))
             except TypeError:
                 pass
             # check if there was a large influence swing
             inf_difference = round((presence.influence[0] - presence.influence[1]) * 100, 1)
             if abs(inf_difference) > 3:
-                alert = '{faction} had an influence swing of {swing} in {system}'
-                alert = alert.format(faction=faction.name, swing=inf_difference, system=system.name)
-                alerts.append(alert)
+                alert = 'Influence swung by {swing} in {system}'
+                alert = alert.format(swing=inf_difference, system=system.name)
+                level = 'bonus'
+                if inf_difference < 0:
+                    level = 'warning'
+                alert_entry['alerts'].append((alert, level))
             if not presence.system_id == faction.home_system_id:
                 # check if influence is in danger of retreat state
                 influence = round(presence.influence[0]*100, 1)
@@ -48,28 +56,32 @@ def get_alerts():
                             opponent = conflict.faction_name_1
                             if faction.name in opponent:
                                 opponent = conflict.faction_name_2
-                            alert = '{faction} influence may drop below 5% if conflict against {opponent} is lost in {system}'
-                            alert = alert.format(faction=faction.name, opponent=opponent, system=system.name)
-                            alerts.append(alert)
+                            alert = 'Influence may drop below 5% if conflict against {opponent} is lost in {system}'
+                            alert = alert.format(opponent=opponent, system=system.name)
+                            alert_entry['alerts'].append((alert, 'warning'))
                         except TypeError:
                             pass
                     elif influence < 5:
-                        alert = '{faction} influence below 5% in {system}'
-                        alert = alert.format(faction=faction.name, system=system.name)
-                        alerts.append(alert)
+                        alert = 'Influence below 5% in {system}'
+                        alert = alert.format(system=system.name)
+                        alert_entry['alerts'].append((alert, 'warning'))
         try:
             expansion = database.fetch_expansion(__conn, fac_id=faction.faction_id)
             date_detected = expansion.detected_on.split()[0]
-            alert = '{faction} has {stage} expansion detected on {detected}'
-            alert = alert.format(faction=faction.name, stage=expansion.stage, detected=date_detected)
-            alerts.append(alert)
+            alert = '{stage} expansion detected on {detected}'
+            alert = alert.format(stage=expansion.stage, detected=date_detected)
+            alert_entry['alerts'].append((alert, 'bonus'))
             if expansion.system_id is None:
-                alert = 'Expansion for {faction} is not being tracked'
-                alert = alert.format(faction=faction.name)
-                alerts.append(alert)
+                alert = 'Expansion is not being tracked (WIP)'
+                alert_entry['alerts'].append((alert, 'info'))
         except TypeError:
             pass
-    return alerts
+        if len(alert_entry['alerts']) > 0:
+            alert_entry['alerts'] = sorted(alert_entry['alerts'], key=lambda s: s[1])
+            alerts.append(alert_entry)
+            alert_count += len(alert_entry['alerts'])
+    alerts = sorted(alerts, key=lambda s: s['name'])
+    return alerts, alert_count
 
 
 def get_system(system):
@@ -139,6 +151,14 @@ def get_system(system):
 
     conflicts = database.fetch_conflict(__conn, sys_id=system_db.system_id)
 
+    for conflict in conflicts:
+        conflict.updated_at = time_since(conflict.updated_at)
+        conflict.date_started = datetime.strftime(datetime.strptime(conflict.date_started, database.DATETIME_FMT), '%d/%b/%y')
+        if conflict.faction_stake_1 == '':
+            conflict.faction_stake_1 = 'None'
+        if conflict.faction_stake_2 == '':
+            conflict.faction_stake_2 = 'None'
+
     results.append(systems_sorted)
     results.append(conflicts)
     return results
@@ -170,10 +190,11 @@ def get_faction(faction):
     """
     Gets all relevant data on a faction
     :param faction: the name or ID of the faction
-    :return: faction name and list of systems the faction is in
+    :return: faction name, list of systems the faction is in, list of conflicts
     """
     faction_db = database.fetch_faction(__conn, faction)
     presence_db = database.fetch_presence(__conn, fac_id=faction_db.faction_id)
+    conflict_db = database.fetch_conflict(__conn, fac_name=faction_db.name)
 
     results = [faction_db.name]
     sys_results = []
@@ -209,7 +230,70 @@ def get_faction(faction):
         sys_results.append(row)
     systems_sorted = sorted(sys_results, key=lambda f: float(f['influence'].strip('%')), reverse=True)
     results.append(systems_sorted)
+
+    conflicts = []
+    for conflict in conflict_db:
+        opponent = conflict.faction_name_1
+        days_won = conflict.faction_score_2
+        days_lost = conflict.faction_score_1
+        stake_at_risk = conflict.faction_stake_2
+        stake_to_win = conflict.faction_stake_1
+        if opponent == faction_db.name:
+            opponent = conflict.faction_name_2
+            days_won, days_lost = days_lost, days_won
+            stake_at_risk, stake_to_win = stake_to_win, stake_at_risk
+
+        opponent_db = database.fetch_faction(__conn, opponent)
+        system = database.fetch_system(__conn, conflict.system_id)
+        date_started = datetime.strftime(datetime.strptime(conflict.date_started, database.DATETIME_FMT), '%d/%b/%y')
+        update = time_since(conflict.updated_at)
+        conflict_data = {
+            'system_id': system.system_id,
+            'system_name': system.name,
+            'stake_at_risk': stake_at_risk,
+            'score': '{} - {}'.format(days_won, days_lost),
+            'opponent': opponent,
+            'opponent_id': opponent_db.faction_id,
+            'stake_to_win': stake_to_win,
+            'stage': conflict.stage,
+            'date_started': date_started,
+            'updated_at': update
+        }
+        conflicts.append(conflict_data)
+    results.append(conflicts)
     return results
+
+
+def get_tracked_factions():
+    """
+    Gets a list of all master factions
+    :return: a list of factions
+    """
+    sql = 'SELECT * FROM Faction WHERE master=0'
+    factions = database.query(__conn, sql)
+    result = []
+    for faction in factions:
+        faction = classes.Faction(faction)
+        systems = len(database.fetch_presence(__conn, fac_id=faction.faction_id))
+        sql = 'SELECT system_id FROM System WHERE controlling_faction=?'
+        controlling = len(database.query(__conn, sql, (faction.name,)))
+        conflicts = len(bin(faction.conflict_flags).strip('0b'))
+        expansion = 'Not active'
+        try:
+            expansion = database.fetch_expansion(__conn, faction.faction_id)
+            expansion = expansion.stage
+        except TypeError:
+            pass
+        data = {
+            'id': faction.faction_id,
+            'name': faction.name,
+            'systems': systems,
+            'controlling': controlling,
+            'conflicts': conflicts,
+            'expansion': expansion
+        }
+        result.append(data)
+    return result
 
 
 def get_all_factions():

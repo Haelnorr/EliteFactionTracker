@@ -4,7 +4,8 @@ from . import log
 from . import database
 from . import bgsapi
 import threading
-from . import listener
+from .listener import receiver
+from .listener import parser
 import time
 
 log.start('tracker')
@@ -34,18 +35,18 @@ def main():
     # start producing/consumer threading
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-        _listener = executor.submit(listener.receiver, pipeline, shutdown)
-        _consumer = executor.submit(listener.consumer, pipeline, shutdown)
+        _receiver = executor.submit(receiver, pipeline, shutdown)
+        _parser = executor.submit(parser, pipeline, shutdown)
 
         while not shutdown.is_set():
-            if not _listener.running():
-                log.error('Listener Exception: %s' % _listener.exception())
+            if not _receiver.running():
+                log.error('Listener Exception: %s' % _receiver.exception())
                 time.sleep(5)
-                _listener = executor.submit(listener.receiver, pipeline, shutdown)
-            elif not _consumer.running():
-                log.error('Consumer Exception: %s' % _consumer.exception())
+                _receiver = executor.submit(receiver, pipeline, shutdown)
+            elif not _parser.running():
+                log.error('Consumer Exception: %s' % _parser.exception())
                 time.sleep(5)
-                _consumer = executor.submit(listener.consumer, pipeline, shutdown)
+                _parser = executor.submit(parser, pipeline, shutdown)
 
         conn.close()  # close database connection when program ends
     # listener is running

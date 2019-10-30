@@ -138,7 +138,7 @@ def new_faction(faction_name):
                         _conflict['faction1']['stake'],
                         _conflict['faction2']['stake'],
                         timestamp,
-                        _conflict['status'],
+                        _conflict['status'].capitalize(),
                         timestamp
                     )
                     try:
@@ -189,11 +189,11 @@ def new_faction(faction_name):
             for pending in system['pending_states']:
                 if 'expansion' in pending['state']:
                     _expansion[0] = True
-                    _expansion[1] = 'pending'
+                    _expansion[1] = 'Pending'
             for active in system['active_states']:
                 if 'expansion' in active['state']:
                     _expansion[0] = True
-                    _expansion[1] = 'active'
+                    _expansion[1] = 'Active'
 
     # do expansion check
     if _expansion[0] is True:
