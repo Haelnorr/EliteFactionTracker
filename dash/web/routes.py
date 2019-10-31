@@ -2,7 +2,7 @@ from flask import render_template, redirect, flash, url_for, request
 from . import dash_app, db
 from ...definitions import VERSION
 from .. import datafetch
-from .forms import LoginForm, ChangePassword
+from .forms import LoginForm, ChangePassword, UserEdit, NewUser
 from flask_login import current_user, login_user, logout_user, login_required
 from .models import User
 from werkzeug.urls import url_parse
@@ -101,5 +101,22 @@ def change_pass():
 def users():
     if current_user.reset_pass is True:
         return redirect(url_for('change_pass'))
-    user_list = User.query.with_entities(User.username, User.permission, User.reset_pass)
-    return render_template('users.html', page='Users', version=VERSION)
+    user_list = User.query.with_entities(User.username, User.permission, User.id)
+    return render_template('users.html', page='Users', version=VERSION, users=user_list)
+
+
+@dash_app.route('/manage/users/edit')
+@dash_app.route('/manage/users/edit/<user_id>')
+@login_required
+def user_edit(user_id=None):
+    if current_user.reset_pass is True:
+        return redirect(url_for('change_pass'))
+    if user_id is None or user_id == '1':
+        return redirect(url_for('users'))
+    user = User.query.filter_by(id=user_id).first()
+    if user is None:
+        flash('Some error occurred, try again and if the problem persists contact the administrator')
+        return redirect(url_for('users'))
+    form = UserEdit()
+    # code for if form submitted
+    return render_template('user_edit.html', page='Edit User', version=VERSION, user=user, current_user=current_user, form=form)
