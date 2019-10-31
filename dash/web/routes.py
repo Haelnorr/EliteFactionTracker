@@ -86,7 +86,7 @@ def change_pass():
     if form.validate_on_submit():
         user = User.query.filter_by(username=current_user.username).first()
         if user is None:
-            flash('Some error occurred, try again and if the problem persists contact the administrator')
+            flash('Some error occurred, try again and if the problem persists contact the system administrator')
             return redirect(url_for('change_pass'))
         user.set_password(form.password.data)
         user.reset_pass = False
@@ -106,17 +106,44 @@ def users():
 
 
 @dash_app.route('/manage/users/edit')
-@dash_app.route('/manage/users/edit/<user_id>')
+@dash_app.route('/manage/users/edit/<user_id>', methods=['GET', 'POST'])
 @login_required
 def user_edit(user_id=None):
     if current_user.reset_pass is True:
         return redirect(url_for('change_pass'))
-    if user_id is None or user_id == '1':
+    if user_id is None or user_id == '1' or not current_user.permission == 'Administrator':
         return redirect(url_for('users'))
     user = User.query.filter_by(id=user_id).first()
     if user is None:
-        flash('Some error occurred, try again and if the problem persists contact the administrator')
+        flash('Some error occurred, try again and if the problem persists contact the system administrator')
         return redirect(url_for('users'))
-    form = UserEdit()
-    # code for if form submitted
+    if user.permission == 'Administrator' and not current_user.id == 1:
+        return redirect(url_for('users'))
+    form = UserEdit(permission=user.permission)
+    if form.validate_on_submit():
+        user.permission = form.permission.data
+        if form.reset_pass.data is True:
+            user.set_password(form.new_pass.data)
+            user.reset_pass = True
+        db.session.add(user)
+        db.session.commit()
+        return redirect(url_for('users'))
     return render_template('user_edit.html', page='Edit User', version=VERSION, user=user, current_user=current_user, form=form)
+
+
+@dash_app.route('/manage/users/add', methods=['GET', 'POST'])
+@login_required
+def add_user():
+    if current_user.reset_pass is True:
+        return redirect(url_for('change_pass'))
+    if not current_user.permission == 'Administrator':
+        return redirect(url_for('users'))
+    form = NewUser()
+    if form.validate_on_submit():
+        # noinspection PyArgumentList
+        user = User(username=form.username.data, permission=form.permission.data, reset_pass=True)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        return redirect(url_for('users'))
+    return render_template('new_user.html', page='New User', version=VERSION, form=form)

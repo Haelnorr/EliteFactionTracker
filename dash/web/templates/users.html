@@ -4,31 +4,37 @@
 <div id="user-list">
 <table id="user-table">
     {% if current_user.permission == 'Administrator' %}
-    <tr>
+    <tr class="title-row">
         <td id="username">User</td>
         <td id="permission">Permission</td>
         <td id="reset">Modify</td>
     </tr>
     {% for user in users %}
-    <tr>
-        <td>{{ user.username }}</td>
-        <td>{{ user.permission }}</td>
-        <td>
-            {% if user.id != 1 %}
-            <a href="{{ url_for('user_edit', user_id=user.id) }}">Edit</a>
-            {% else %}
-            <a href="{{ url_for('change_pass') }}">Change Password</a>
-            {% endif %}
-        </td>
-    </tr>
+        {% if user.id != 1 or current_user.id == 1 %}
+        <tr class="content-row">
+            <td>{{ user.username }}</td>
+            <td>{{ user.permission }}</td>
+            <td>
+                {% if current_user.id == user.id %}
+                    <a href="{{ url_for('change_pass') }}">Change Password</a>
+                {% elif current_user.id == 1 or current_user.id != 1 and user.permission == 'Manager' %}
+                    <a href="{{ url_for('user_edit', user_id=user.id) }}">Edit</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endif %}
     {% endfor %}
-    <tr>
+    <tr class="content-row">
         <td></td>
-        <td><a>Add user</a></td>
+        <td><a href="{{ url_for('add_user') }}">Add user</a></td>
         <td></td>
     </tr>
     {% else %}
-    <a href="{{ url_for('change_pass') }}">Change Password</a>
+        <tr class="content-row">
+            <td>
+                <a href="{{ url_for('change_pass') }}">Change Password</a>
+            </td>
+        </tr>
     {% endif %}
 </table>
 </div>

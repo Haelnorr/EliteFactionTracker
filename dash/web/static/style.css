@@ -141,7 +141,7 @@ a:link, a:visited {
 }
 
 
-.faction-table, .system-table, .conflict-table {
+.faction-table, .system-table, .conflict-table, #user-table {
     width: 80%;
     background-color: #333333;
     border: 2px solid black;
@@ -206,7 +206,7 @@ a:link, a:visited {
     border: 2px solid #00521e;
 }
 
-#login, #change-pass {
+#login, #change-pass, #user-new, #user-edit {
   background-color: #313131;
   width: 300px;
   text-align: center;
@@ -257,5 +257,4 @@ a:link, a:visited {
 
 #user-table {
     width: 100%;
-    border: 2px solid black;
 }

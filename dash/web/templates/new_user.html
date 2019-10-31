@@ -1,0 +1,30 @@
+{% extends "manage.html " %}
+
+{% block manage %}
+    <form id="user-new" action="" method="post" novalidate>
+        <h3>New User</h3>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.username.label }}<br>
+            {{ form.username(size=32) }}<br>
+            {% for error in form.username.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.permission.label }}<br>
+            {{ form.permission() }}<br>
+        </p>
+        <p>
+            {{ form.password.label }}<br>
+            {{ form.password(size=20) }}<br>
+            {% for error in form.password.errors %}
+            <span style="color: red;">[{{ error }}]</span><br>
+            {% endfor %}
+            Give this password to the user<br>
+            They will be forced to change it on login
+        </p>
+        <p>{{ form.submit() }}</p>
+
+    </form>
+{% endblock %}

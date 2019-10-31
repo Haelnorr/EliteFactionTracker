@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField
-from wtforms.validators import DataRequired, EqualTo
+from wtforms.validators import DataRequired, EqualTo, ValidationError
+from .models import User
 
 
 class LoginForm(FlaskForm):
@@ -21,7 +22,7 @@ class UserEdit(FlaskForm):
         ('Administrator', 'Administrator'),
         ('Manager', 'Manager')
     ]
-    permission = SelectField('Permission', choices=__choices)
+    permission = SelectField('Permission', choices=__choices, default=None)
     reset_pass = BooleanField('Reset password')
     new_pass = StringField('New password')
     submit = SubmitField('Save changes')
@@ -36,3 +37,8 @@ class NewUser(FlaskForm):
     password = StringField('Password', validators=[DataRequired()])
     permission = SelectField('Permission', choices=__choices, default='Manager')
     submit = SubmitField('Add user')
+
+    def validate_username(self, username):
+        user = User.query.filter_by(username=self.username.data).first()
+        if user is not None:
+            raise ValidationError('Please use a different username.')

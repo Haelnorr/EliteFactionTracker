@@ -9,7 +9,7 @@
         </p>
         <p>
             {{ form.permission.label }}:
-            {{ form.permission(default=user.permission) }}<br>
+            {{ form.permission() }}<br>
         </p>
         <p>
             {{ form.reset_pass.label }}: {{ form.reset_pass(onchange="enablePass()") }}<br>
