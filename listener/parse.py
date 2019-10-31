@@ -70,7 +70,7 @@ def __parse_data(system_db, message):
         log.info('Message has new data')
 
         # extract data
-        timestamp = convert_time(message['timestamp'])
+        timestamp = get_utc_now()
 
         # update the system data
         system_entry = (
@@ -339,11 +339,10 @@ def __parse_data(system_db, message):
         log.info('Completed system update: %s ' % system_db.name)
 
 
-def convert_time(timestamp):
+def get_utc_now():
     """
-    Converts Listener timestamp to database timestamp
-    :param timestamp: the timestamp from the Listener
+    Get the time in UTC in a database friendly format
     :return: database friendly timestamp
     """
-    converted = datetime.strftime(datetime.strptime(timestamp, __TIME_FMT), database.DATETIME_FMT)
-    return converted
+    utc_now = datetime.strftime(datetime.utcnow(), database.DATETIME_FMT)
+    return utc_now
