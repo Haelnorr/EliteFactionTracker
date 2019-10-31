@@ -52,7 +52,7 @@ def system(sys_id=None):
 def manage():
     if current_user.reset_pass is True:
         return redirect(url_for('change_pass'))
-    return redirect(url_for('dashboard')) # temp while manage under construction
+    return render_template('manage.html', page='Manage', version=VERSION)
 
 
 @dash_app.route('/manage/login', methods=['GET', 'POST'])
@@ -94,3 +94,12 @@ def change_pass():
         db.session.commit()
         return redirect(url_for('manage'))
     return render_template('change_pass.html', page='Change Password', version=VERSION, form=form)
+
+
+@dash_app.route('/manage/users')
+@login_required
+def users():
+    if current_user.reset_pass is True:
+        return redirect(url_for('change_pass'))
+    user_list = User.query.with_entities(User.username, User.permission, User.reset_pass)
+    return render_template('users.html', page='Users', version=VERSION)

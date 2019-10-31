@@ -1,0 +1,18 @@
+{% extends "manage.html " %}
+
+{% block manage %}
+<table id="user-table">
+    <tr>
+        <td id="username">User</td>
+        <td id="permission">Permission</td>
+        <td id="reset">Reset Pass</td>
+    </tr>
+    {% for user in users %}
+    <tr>
+        <td>{{ user.username }}</td>
+        <td>{{ user.permission }}</td>
+        <td>{{ user.reset_pass }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

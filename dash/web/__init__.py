@@ -11,4 +11,4 @@ migrate = Migrate(dash_app, db)
 login = LoginManager(dash_app)
 login.login_view = 'login'
 
-from . import routes, models
+from . import routes, models, errors

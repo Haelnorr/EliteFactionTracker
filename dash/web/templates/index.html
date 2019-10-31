@@ -10,7 +10,7 @@
         <p>There are {{ alert_count[0] }} alerts for {{ alert_count[1] }} factions</p>
         {% for faction in alerts %}
         <div class="alert-block">
-            <h5><a href='/faction/{{ faction["id"] }}'>{{ faction["name"] }}</a></h5>
+            <h5><a href="{{ url_for('faction', fac_id=faction['id']) }}">{{ faction["name"] }}</a></h5>
                 {% for alert in faction["alerts"] %}
                 <div>
                     <div class="alert-{{ alert[1] }}">
@@ -26,7 +26,7 @@
         <h4>Tracked Factions</h4>
         {% for faction in factions %}
         <div class="faction-tile">
-            <a href='/faction/{{ faction["id"] }}'>{{ faction["name"] }}</a>
+            <a href="{{ url_for('faction', fac_id=faction['id']) }}">{{ faction["name"] }}</a>
             <span>Systems: {{ faction["systems"] }}</span>
             <span>Controlling: {{ faction["controlling"] }}</span>
             <span>Conflicts: {{ faction["conflicts"] }}</span>
