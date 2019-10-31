@@ -131,9 +131,10 @@ def __parse_data(system_db, message):
             log.debug('No conflict found in %s' % system_db.name)
 
         # update factions and presences
+        current_list = []
         for faction in factions:
             if faction[1] is not False:  # 'not tracked' flag was not set
-
+                current_list.append(faction[1].faction_id)
                 # check states
                 try:    # check for pending states
                     for state in faction[0]['PendingStates']:
@@ -308,8 +309,12 @@ def __parse_data(system_db, message):
                     timestamp,
                     master
                 )
-                database.new_faction(db_conn, faction_entry)
-                log.info('New faction added: %s' % faction[0]['Name'])
+                try:
+                    database.new_faction(db_conn, faction_entry)
+                    log.info('New faction added: %s' % faction[0]['Name'])
+                except database.sqlite3.IntegrityError:
+                    log.debug('Faction already exists in the database')
+
                 presence_entry = (
                     system_db.system_id,
                     faction_api['id'],
@@ -318,8 +323,18 @@ def __parse_data(system_db, message):
                     faction[0]['Influence'],
                     timestamp
                 )
-                database.new_presence(db_conn, presence_entry)
-                log.info('Presence of %s in %s added' % (faction[0]['Name'], system_db.name))
+                try:
+                    database.new_presence(db_conn, presence_entry)
+                    log.info('Presence of %s in %s added' % (faction[0]['Name'], system_db.name))
+                except database.sqlite3.IntegrityError:
+                    log.debug('Faction presence already exists in the database')
+
+        # remove retreated factions
+        presences = database.fetch_presence(db_conn, sys_id=system_db.system_id)
+        if not len(presences) == len(factions):
+            for presence in presences:
+                if presence.faction_id not in current_list:
+                    database.query(db_conn, 'DELETE FROM Presence WHERE system_id=? AND faction_id=?', (presence.system_id, presence.faction_id))
 
         log.info('Completed system update: %s ' % system_db.name)
 
