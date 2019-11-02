@@ -40,7 +40,7 @@ def __parse_data(system_db, message):
     factions = []
     master = 0
 
-    # debounce data
+    # debounce influence data
     for faction in message['Factions']:
         influence = faction['Influence']
         faction_name = faction['Name']
@@ -66,6 +66,22 @@ def __parse_data(system_db, message):
 
                 # add to list with 'False' flag to indicate its not tracked
                 factions.append((faction, False))
+
+    # debounce conflicts if influences are static
+    try:
+        for conflict in message['Conflicts']:
+            try:
+                conflict_db = database.fetch_conflict(db_conn, sys_id=system_db.system_id, fac_name=conflict['Faction1']['Name'])
+
+                totaldays_message = int(conflict['Faction1']['WonDays']) + int(conflict['Faction2']['WonDays'])
+                totaldays_db = conflict_db.faction_score_1 + conflict_db.faction_score_2
+                if totaldays_message > totaldays_db:
+                    cached = False
+            except TypeError:
+                pass
+    except KeyError:
+        pass
+
     timestamp = get_utc_now()
     if cached:
         log.info('Message has old data, moving to next message')
