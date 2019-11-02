@@ -50,8 +50,11 @@ def __parse_data(system_db, message):
                 faction_db = database.fetch_faction(db_conn, faction_name)
 
                 presence_db = database.fetch_presence(db_conn, sys_id=system_db.system_id, fac_id=faction_db.faction_id)
+
                 if not influence == presence_db.influence[1] or not influence == presence_db.influence[2]:
                     cached = False
+
+                # work on method of debouncing more accurately
 
                 if faction_db.master is 0:
                     master = faction_db.faction_id
@@ -63,14 +66,19 @@ def __parse_data(system_db, message):
 
                 # add to list with 'False' flag to indicate its not tracked
                 factions.append((faction, False))
-
+    timestamp = get_utc_now()
     if cached:
         log.info('Message has old data, moving to next message')
+        system_entry = (
+            system_db.controlling_faction,
+            timestamp,
+            system_db.system_id
+        )
+        database.update_system(db_conn, system_entry)
+        log.info('System updated: %s' % system_db.name)
+
     else:
         log.info('Message has new data')
-
-        # extract data
-        timestamp = get_utc_now()
 
         # update the system data
         system_entry = (
@@ -78,7 +86,6 @@ def __parse_data(system_db, message):
             timestamp,
             system_db.system_id
         )
-
         database.update_system(db_conn, system_entry)
         log.info('System updated: %s' % system_db.name)
 
