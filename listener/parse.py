@@ -106,6 +106,7 @@ def __parse_data(system_db, message):
         log.info('System updated: %s' % system_db.name)
 
         # update conflicts
+        current_list = []
         try:
             for conflict in message['Conflicts']:
                 try:
@@ -115,6 +116,7 @@ def __parse_data(system_db, message):
                         database.delete_conflict(db_conn, conflict_db.conflict_id)
                         log.debug('Deleted conflict for %s in %s' % (conflict['Faction1']['Name'], system_db.name))
                     else:
+                        current_list.append(conflict_db.conflict_id)
                         # assume faction1 is faction1 in database
                         faction1 = conflict['Faction1']['WonDays']
                         faction2 = conflict['Faction2']['WonDays']
@@ -152,6 +154,13 @@ def __parse_data(system_db, message):
                         log.info('New conflict found')
         except KeyError:
             log.debug('No conflict found in %s' % system_db.name)
+
+        # delete any conflicts that missed the retreat stage deletion
+        conflicts_db = database.fetch_conflict(db_conn, sys_id=system_db.system_id)
+        if not len(conflicts_db) == len(current_list):
+            for conflict in conflicts_db:
+                if conflict.conflict_id not in current_list:
+                    database.delete_conflict(db_conn, conflict.conflict_id)
 
         # update factions and presences
         current_list = []
