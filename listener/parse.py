@@ -40,7 +40,7 @@ def __parse_data(system_db, message):
     factions = []
     master = 0
 
-    # debounce data
+    # debounce influence data
     for faction in message['Factions']:
         influence = faction['Influence']
         faction_name = faction['Name']
@@ -50,8 +50,11 @@ def __parse_data(system_db, message):
                 faction_db = database.fetch_faction(db_conn, faction_name)
 
                 presence_db = database.fetch_presence(db_conn, sys_id=system_db.system_id, fac_id=faction_db.faction_id)
+
                 if not influence == presence_db.influence[1] or not influence == presence_db.influence[2]:
                     cached = False
+
+                # work on method of debouncing more accurately
 
                 if faction_db.master is 0:
                     master = faction_db.faction_id
@@ -64,13 +67,34 @@ def __parse_data(system_db, message):
                 # add to list with 'False' flag to indicate its not tracked
                 factions.append((faction, False))
 
+    # debounce conflicts if influences are static
+    try:
+        for conflict in message['Conflicts']:
+            try:
+                conflict_db = database.fetch_conflict(db_conn, sys_id=system_db.system_id, fac_name=conflict['Faction1']['Name'])
+
+                totaldays_message = int(conflict['Faction1']['WonDays']) + int(conflict['Faction2']['WonDays'])
+                totaldays_db = conflict_db.faction_score_1 + conflict_db.faction_score_2
+                if totaldays_message > totaldays_db:
+                    cached = False
+            except TypeError:
+                pass
+    except KeyError:
+        pass
+
+    timestamp = get_utc_now()
     if cached:
         log.info('Message has old data, moving to next message')
+        system_entry = (
+            system_db.controlling_faction,
+            timestamp,
+            system_db.system_id
+        )
+        database.update_system(db_conn, system_entry)
+        log.info('System updated: %s' % system_db.name)
+
     else:
         log.info('Message has new data')
-
-        # extract data
-        timestamp = convert_time(message['timestamp'])
 
         # update the system data
         system_entry = (
@@ -78,7 +102,6 @@ def __parse_data(system_db, message):
             timestamp,
             system_db.system_id
         )
-
         database.update_system(db_conn, system_entry)
         log.info('System updated: %s' % system_db.name)
 
@@ -131,9 +154,10 @@ def __parse_data(system_db, message):
             log.debug('No conflict found in %s' % system_db.name)
 
         # update factions and presences
+        current_list = []
         for faction in factions:
             if faction[1] is not False:  # 'not tracked' flag was not set
-
+                current_list.append(faction[1].faction_id)
                 # check states
                 try:    # check for pending states
                     for state in faction[0]['PendingStates']:
@@ -308,8 +332,12 @@ def __parse_data(system_db, message):
                     timestamp,
                     master
                 )
-                database.new_faction(db_conn, faction_entry)
-                log.info('New faction added: %s' % faction[0]['Name'])
+                try:
+                    database.new_faction(db_conn, faction_entry)
+                    log.info('New faction added: %s' % faction[0]['Name'])
+                except database.sqlite3.IntegrityError:
+                    log.debug('Faction already exists in the database')
+
                 presence_entry = (
                     system_db.system_id,
                     faction_api['id'],
@@ -318,17 +346,26 @@ def __parse_data(system_db, message):
                     faction[0]['Influence'],
                     timestamp
                 )
-                database.new_presence(db_conn, presence_entry)
-                log.info('Presence of %s in %s added' % (faction[0]['Name'], system_db.name))
+                try:
+                    database.new_presence(db_conn, presence_entry)
+                    log.info('Presence of %s in %s added' % (faction[0]['Name'], system_db.name))
+                except database.sqlite3.IntegrityError:
+                    log.debug('Faction presence already exists in the database')
+
+        # remove retreated factions
+        presences = database.fetch_presence(db_conn, sys_id=system_db.system_id)
+        if not len(presences) == len(factions):
+            for presence in presences:
+                if presence.faction_id not in current_list:
+                    database.query(db_conn, 'DELETE FROM Presence WHERE system_id=? AND faction_id=?', (presence.system_id, presence.faction_id))
 
         log.info('Completed system update: %s ' % system_db.name)
 
 
-def convert_time(timestamp):
+def get_utc_now():
     """
-    Converts Listener timestamp to database timestamp
-    :param timestamp: the timestamp from the Listener
+    Get the time in UTC in a database friendly format
     :return: database friendly timestamp
     """
-    converted = datetime.strftime(datetime.strptime(timestamp, __TIME_FMT), database.DATETIME_FMT)
-    return converted
+    utc_now = datetime.strftime(datetime.utcnow(), database.DATETIME_FMT)
+    return utc_now
