@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, TextAreaField
+from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired, EqualTo, ValidationError
 from .models import User
 
@@ -51,3 +52,17 @@ class DeleteUser(FlaskForm):
     def validate_confirm(self, confirm):
         if self.confirm.data is False:
             raise ValidationError('Check the box to confirm deletion.')
+
+
+class NewNotice(FlaskForm):
+    __choices = [
+        (1, 'High'),
+        (2, 'Medium'),
+        (3, 'Low')
+    ]
+    post_title = StringField('Title', validators=[DataRequired()])
+    priority = SelectField('Priority', coerce=int, choices=__choices, default=3)
+    expiry_enable = BooleanField('Set to expire')
+    expiry = DateField('Expiry', format='%Y-%m-%d')
+    message = TextAreaField('Message', validators=[DataRequired()])
+    submit = SubmitField('Create Notice')

@@ -1,11 +1,11 @@
 from flask import render_template, redirect, flash, url_for, request
-from . import dash_app, db
+from . import dash_app, db, forms
 from ...definitions import VERSION
 from .. import datafetch
-from .forms import LoginForm, ChangePassword, UserEdit, NewUser, DeleteUser
 from flask_login import current_user, login_user, logout_user, login_required
 from .models import User, Notice
 from werkzeug.urls import url_parse
+from datetime import time, datetime
 
 
 @dash_app.route('/index')
@@ -59,7 +59,7 @@ def manage():
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('manage'))
-    form = LoginForm()
+    form = forms.LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
@@ -82,7 +82,7 @@ def logout():
 @dash_app.route('/manage/change_pass', methods=['GET', 'POST'])
 @login_required
 def change_pass():
-    form = ChangePassword()
+    form = forms.ChangePassword()
     if form.validate_on_submit():
         user = User.query.filter_by(username=current_user.username).first()
         if user is None:
@@ -119,7 +119,7 @@ def user_edit(user_id=None):
         return redirect(url_for('users'))
     if user.permission == 'Administrator' and not current_user.id == 1:
         return redirect(url_for('users'))
-    form = UserEdit(permission=user.permission)
+    form = forms.UserEdit(permission=user.permission)
     if form.validate_on_submit():
         user.permission = form.permission.data
         if form.reset_pass.data is True:
@@ -138,7 +138,7 @@ def add_user():
         return redirect(url_for('change_pass'))
     if not current_user.permission == 'Administrator':
         return redirect(url_for('users'))
-    form = NewUser()
+    form = forms.NewUser()
     if form.validate_on_submit():
         # noinspection PyArgumentList
         user = User(username=form.username.data, permission=form.permission.data, reset_pass=True)
@@ -164,7 +164,7 @@ def delete_user(user_id=None):
         return redirect(url_for('users'))
     if user.permission == 'Administrator' and not current_user.id == 1:
         return redirect(url_for('users'))
-    form = DeleteUser()
+    form = forms.DeleteUser()
     if form.validate_on_submit():
         if form.confirm.data is True:
             User.query.filter_by(id=user.id).delete()
@@ -180,5 +180,23 @@ def delete_user(user_id=None):
 def manage_notices():
     if current_user.reset_pass is True:
         return redirect(url_for('change_pass'))
-    notices = Notice.query.all()
+    notices = Notice.query.order_by(Notice.priority)
     return render_template('notices-manage.html', page='Manage Notices', version=VERSION, notices=notices)
+
+
+@dash_app.route('/manage/notices/new', methods=['GET', 'POST'])
+@login_required
+def new_notice():
+    if current_user.reset_pass is True:
+        return redirect(url_for('change_pass'))
+    form = forms.NewNotice()
+    if form.validate_on_submit():
+        if form.expiry_enable.data is True:
+            expiry = datetime.combine(form.expiry.data, time(12))
+        else:
+            expiry = None
+        notice = Notice(title=form.post_title.data, priority=form.priority.data, expiry=expiry, message=form.message.data, author=current_user)
+        db.session.add(notice)
+        db.session.commit()
+        return redirect(url_for('manage_notices'))
+    return render_template('notices-new.html', page='New Notice', version=VERSION, form=form)

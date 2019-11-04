@@ -3,14 +3,12 @@
 {% block manage %}
 <div id="manage-content">
     <h3>Notices</h3>
-    <a href="">Create New Notice</a>
-    {% if notices|length == 0 %}
-        <p>There are no notices to show</p>
-    {% else %}
+    <a href="{{ url_for('new_notice') }}">Create New Notice</a>
     <table id="notice-table" class="tables">
         <tr class="title-row">
             <td>Title</td>
             <td>Author</td>
+            <td>Priority</td>
             <td>Posted On</td>
             <td>Expires</td>
             <td>Manage</td>
@@ -19,6 +17,15 @@
         <tr class="content-row">
             <td>{{ notice.title }}</td>
             <td>{{ notice.author.username }}</td>
+            <td>
+                {% if notice.priority == 1 %}
+                High
+                {% elif notice.priority == 2 %}
+                Medium
+                {% else %}
+                Low
+                {% endif %}
+            </td>
             <td>{{ notice.timestamp|datetime }}</td>
             <td>
                 {% if notice.expiry == None %}
@@ -31,6 +38,5 @@
         </tr>
         {% endfor %}
     </table>
-    {% endif %}
 </div>
 {% endblock %}

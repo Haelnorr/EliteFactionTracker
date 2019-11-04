@@ -305,3 +305,12 @@ a:link, a:visited {
     margin-left: auto;
     margin-right: auto;
 }
+
+#notice-new {
+    width: 600px;
+}
+
+#notice-new #message {
+    width: 580px;
+    height: 150px;
+}
