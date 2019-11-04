@@ -1,0 +1,18 @@
+{% extends "manage.html " %}
+
+{% block manage %}
+    <form id="notice-delete" class="forms" action="" method="post" novalidate>
+        <h3>Delete Notice</h3>
+        {{ form.hidden_tag() }}
+        <p>
+            Are you sure you want to delete this notice?<br>
+            '{{ notice.title }}'<br>
+            {{ form.confirm.label }}: {{ form.confirm() }}<br>
+            {% for error in form.confirm.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}  <a href="{{ url_for('manage_notices') }}" id="cancel">Cancel</a></p>
+
+    </form>
+{% endblock %}

@@ -34,7 +34,11 @@
                 {{ notice.expiry|datetime }}
                 {% endif %}
             </td>
-            <td><a href="">Edit</a> | <a href="">Delete</a></td>
+            <td>
+                {% if current_user.permission == 'Administrator' or current_user.id == notice.author.id %}
+                <a href="">Edit</a> | <a href="{{ url_for('delete_notice', notice_id=notice.id) }}">Delete</a>
+                {% endif %}
+            </td>
         </tr>
         {% endfor %}
     </table>

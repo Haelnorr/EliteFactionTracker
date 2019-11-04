@@ -314,3 +314,9 @@ a:link, a:visited {
     width: 580px;
     height: 150px;
 }
+
+#notice-delete input[type=submit] {
+    background-color: #d12a0d;
+    border: 2px solid #821704;
+    color: #e3e3e3;
+}

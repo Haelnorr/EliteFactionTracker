@@ -66,3 +66,12 @@ class NewNotice(FlaskForm):
     expiry = DateField('Expiry', format='%Y-%m-%d')
     message = TextAreaField('Message', validators=[DataRequired()])
     submit = SubmitField('Create Notice')
+
+
+class DeleteNotice(FlaskForm):
+    confirm = BooleanField('Confirm')
+    submit = SubmitField('Delete Notice')
+
+    def validate_confirm(self, confirm):
+        if self.confirm.data is False:
+            raise ValidationError('Check the box to confirm deletion.')

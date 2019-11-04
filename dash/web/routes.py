@@ -128,7 +128,7 @@ def user_edit(user_id=None):
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('users'))
-    return render_template('user_edit.html', page='Edit User', version=VERSION, user=user, current_user=current_user, form=form)
+    return render_template('users_edit.html', page='Edit User', version=VERSION, user=user, current_user=current_user, form=form)
 
 
 @dash_app.route('/manage/users/add', methods=['GET', 'POST'])
@@ -146,7 +146,7 @@ def add_user():
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('users'))
-    return render_template('new_user.html', page='New User', version=VERSION, form=form)
+    return render_template('users_new.html', page='New User', version=VERSION, form=form)
 
 
 @dash_app.route('/manage/users/delete')
@@ -172,7 +172,7 @@ def delete_user(user_id=None):
             return redirect(url_for('users'))
         else:
             flash('Check the box to confirm deletion')
-    return render_template('delete_user.html', page='Delete User', version=VERSION, form=form, user=user)
+    return render_template('users_delete.html', page='Delete User', version=VERSION, form=form, user=user)
 
 
 @dash_app.route('/manage/notices')
@@ -181,7 +181,7 @@ def manage_notices():
     if current_user.reset_pass is True:
         return redirect(url_for('change_pass'))
     notices = Notice.query.order_by(Notice.priority)
-    return render_template('notices-manage.html', page='Manage Notices', version=VERSION, notices=notices)
+    return render_template('notices_manage.html', page='Manage Notices', version=VERSION, notices=notices)
 
 
 @dash_app.route('/manage/notices/new', methods=['GET', 'POST'])
@@ -199,4 +199,26 @@ def new_notice():
         db.session.add(notice)
         db.session.commit()
         return redirect(url_for('manage_notices'))
-    return render_template('notices-new.html', page='New Notice', version=VERSION, form=form)
+    return render_template('notices_new.html', page='New Notice', version=VERSION, form=form)
+
+
+@dash_app.route('/manage/notices/delete')
+@dash_app.route('/manage/notices/delete/<notice_id>', methods=['GET', 'POST'])
+@login_required
+def delete_notice(notice_id=None):
+    if current_user.reset_pass is True:
+        return redirect(url_for('change_pass'))
+    notice = Notice.query.filter_by(id=notice_id).first()
+    if notice is None:
+        return redirect(url_for('manage_notices'))
+    if not current_user.permission == 'Administrator' and not current_user.id == notice.author.id:
+        return redirect(url_for('manage_notices'))
+    form = forms.DeleteNotice()
+    if form.validate_on_submit():
+        if form.confirm.data is True:
+            Notice.query.filter_by(id=notice.id).delete()
+            db.session.commit()
+            return redirect(url_for('manage_notices'))
+        else:
+            flash('Check the box to confirm deletion')
+    return render_template('notices_delete.html', page='Delete Notice', version=VERSION, form=form, notice=notice)
