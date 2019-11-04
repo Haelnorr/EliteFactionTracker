@@ -206,7 +206,7 @@ a:link, a:visited {
     border: 2px solid #00521e;
 }
 
-#login, #change-pass, #user-new, #user-edit {
+.forms {
   background-color: #313131;
   width: 300px;
   text-align: center;
@@ -216,6 +216,38 @@ a:link, a:visited {
   margin-left: auto;
   margin-right: auto;
   margin-top: 30px;
+}
+
+.forms input[type=submit] {
+    border-radius: 3px;
+    border: 2px solid #999999;
+    height: 33px;
+    font-size: 16px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-top: -1px;
+    line-height: 23px;
+}
+
+.forms input[type=submit]:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.forms #cancel {
+    padding: 5px;
+    border-radius: 3px;
+    border: 2px solid #999999;
+    background-color: #dddddd;
+    color: black;
+    text-decoration: none;
+    font-size: 16px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.forms #cancel:hover {
+    text-decoration: underline;
 }
 
 #manage-dash {
@@ -257,4 +289,10 @@ a:link, a:visited {
 
 #user-table {
     width: 100%;
+}
+
+#user-delete input[type=submit] {
+    background-color: #d12a0d;
+    border: 2px solid #821704;
+    color: #e3e3e3;
 }

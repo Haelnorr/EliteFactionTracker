@@ -42,3 +42,12 @@ class NewUser(FlaskForm):
         user = User.query.filter_by(username=self.username.data).first()
         if user is not None:
             raise ValidationError('Please use a different username.')
+
+
+class DeleteUser(FlaskForm):
+    confirm = BooleanField('Confirm')
+    submit = SubmitField('Delete User')
+
+    def validate_confirm(self, confirm):
+        if self.confirm.data is False:
+            raise ValidationError('Check the box to confirm deletion.')

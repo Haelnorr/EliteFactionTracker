@@ -1,7 +1,7 @@
 {% extends "manage.html " %}
 
 {% block manage %}
-    <form id="user-edit" action="" method="post" novalidate>
+    <form id="user-edit" class="forms" action="" method="post" novalidate>
         <h3>Edit User</h3>
         {{ form.hidden_tag() }}
         <p>
@@ -21,7 +21,7 @@
             {{ form.new_pass.label }}:<br>
             {{ form.new_pass(size=20) }}<br>
         </p>
-        <p>{{ form.submit() }}</p>
+        <p>{{ form.submit() }}  <a href="{{ url_for('users') }}" id="cancel">Cancel</a></p>
         <script>
             function enablePass(){
               var checked = document.getElementById('reset_pass').checked

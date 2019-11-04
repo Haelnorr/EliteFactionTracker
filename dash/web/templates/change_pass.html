@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <form id="change-pass" action="" method="post" novalidate>
+    <form id="change-pass" class="forms" action="" method="post" novalidate>
         <h3>Change Password</h3>
         {{ form.hidden_tag() }}
         <p>
@@ -18,6 +18,6 @@
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
-        <p>{{ form.submit() }}</p>
+        <p>{{ form.submit() }}  <a href="{{ url_for('users') }}" id="cancel">Cancel</a></p>
     </form>
 {% endblock %}

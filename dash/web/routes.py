@@ -2,7 +2,7 @@ from flask import render_template, redirect, flash, url_for, request
 from . import dash_app, db
 from ...definitions import VERSION
 from .. import datafetch
-from .forms import LoginForm, ChangePassword, UserEdit, NewUser
+from .forms import LoginForm, ChangePassword, UserEdit, NewUser, DeleteUser
 from flask_login import current_user, login_user, logout_user, login_required
 from .models import User
 from werkzeug.urls import url_parse
@@ -147,3 +147,29 @@ def add_user():
         db.session.commit()
         return redirect(url_for('users'))
     return render_template('new_user.html', page='New User', version=VERSION, form=form)
+
+
+@dash_app.route('/manage/users/delete')
+@dash_app.route('/manage/users/delete/<user_id>', methods=['GET', 'POST'])
+@login_required
+def delete_user(user_id=None):
+    if current_user.reset_pass is True:
+        return redirect(url_for('change_pass'))
+    if not current_user.permission == 'Administrator':
+        return redirect(url_for('users'))
+    user = User.query.filter_by(id=user_id).first()
+    if user is None:
+        return redirect(url_for('users'))
+    if user.id == 1:
+        return redirect(url_for('users'))
+    if user.permission == 'Administrator' and not current_user.id == 1:
+        return redirect(url_for('users'))
+    form = DeleteUser()
+    if form.validate_on_submit():
+        if form.confirm.data is True:
+            User.query.filter_by(id=user.id).delete()
+            db.session.commit()
+            return redirect(url_for('users'))
+        else:
+            flash('Check the box to confirm deletion')
+    return render_template('delete_user.html', page='Delete User', version=VERSION, form=form, user=user)

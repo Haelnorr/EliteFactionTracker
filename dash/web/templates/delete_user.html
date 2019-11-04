@@ -1,0 +1,17 @@
+{% extends "manage.html " %}
+
+{% block manage %}
+    <form id="user-delete" class="forms" action="" method="post" novalidate>
+        <h3>Delete User</h3>
+        {{ form.hidden_tag() }}
+        <p>
+            Are you sure you want to delete user '{{ user.username }}' ?<br>
+            {{ form.confirm.label }}: {{ form.confirm() }}<br>
+            {% for error in form.confirm.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}  <a href="{{ url_for('users') }}" id="cancel">Cancel</a></p>
+
+    </form>
+{% endblock %}

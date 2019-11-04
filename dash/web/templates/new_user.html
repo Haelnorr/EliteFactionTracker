@@ -1,7 +1,7 @@
 {% extends "manage.html " %}
 
 {% block manage %}
-    <form id="user-new" action="" method="post" novalidate>
+    <form id="user-new" class="forms" action="" method="post" novalidate>
         <h3>New User</h3>
         {{ form.hidden_tag() }}
         <p>
@@ -24,7 +24,7 @@
             Give this password to the user<br>
             They will be forced to change it on login
         </p>
-        <p>{{ form.submit() }}</p>
+        <p>{{ form.submit() }}  <a href="{{ url_for('users') }}" id="cancel">Cancel</a></p>
 
     </form>
 {% endblock %}
