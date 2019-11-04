@@ -4,7 +4,7 @@
 <div id="content">
     {% if faction == True %}
     <h2>{{ data[0] }}</h2>
-    <table class="faction-table">
+    <table class="faction-table tables">
         <tr class="title-row">
             <td>System</td>
             <td>Influence</td>
@@ -32,7 +32,7 @@
     {% if data[2]|length == 0 %}
     <p>There are no conflicts to show</p>
     {% else %}
-    <table class="conflict-table">
+    <table class="conflict-table tables">
         <tr class="title-row">
             <td>System</td>
             <td>Stake at Risk</td>
@@ -59,7 +59,7 @@
     {% endif %}
     {% else %}
     <h2>Tracked Factions</h2>
-    <table class="faction-table">
+    <table class="faction-table tables">
         <tr class="title-row">
             <td>Faction</td>
             <td>Last Updated</td>
@@ -72,7 +72,7 @@
         {% endfor %}
     </table>
     <h2>Secondary Factions</h2>
-    <table class="faction-table">
+    <table class="faction-table tables">
         <tr class="title-row">
             <td>Faction</td>
             <td>Last Updated</td>

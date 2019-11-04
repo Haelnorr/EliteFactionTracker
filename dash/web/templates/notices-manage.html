@@ -1,0 +1,36 @@
+{% extends "manage.html " %}
+
+{% block manage %}
+<div id="manage-content">
+    <h3>Notices</h3>
+    <a href="">Create New Notice</a>
+    {% if notices|length == 0 %}
+        <p>There are no notices to show</p>
+    {% else %}
+    <table id="notice-table" class="tables">
+        <tr class="title-row">
+            <td>Title</td>
+            <td>Author</td>
+            <td>Posted On</td>
+            <td>Expires</td>
+            <td>Manage</td>
+        </tr>
+        {% for notice in notices %}
+        <tr class="content-row">
+            <td>{{ notice.title }}</td>
+            <td>{{ notice.author.username }}</td>
+            <td>{{ notice.timestamp|datetime }}</td>
+            <td>
+                {% if notice.expiry == None %}
+                Never
+                {% else %}
+                {{ notice.expiry|datetime }}
+                {% endif %}
+            </td>
+            <td><a href="">Edit</a> | <a href="">Delete</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+</div>
+{% endblock %}

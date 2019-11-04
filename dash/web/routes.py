@@ -4,7 +4,7 @@ from ...definitions import VERSION
 from .. import datafetch
 from .forms import LoginForm, ChangePassword, UserEdit, NewUser, DeleteUser
 from flask_login import current_user, login_user, logout_user, login_required
-from .models import User
+from .models import User, Notice
 from werkzeug.urls import url_parse
 
 
@@ -52,7 +52,7 @@ def system(sys_id=None):
 def manage():
     if current_user.reset_pass is True:
         return redirect(url_for('change_pass'))
-    return render_template('manage.html', page='Manage', version=VERSION)
+    return redirect(url_for('manage_notices'))
 
 
 @dash_app.route('/manage/login', methods=['GET', 'POST'])
@@ -173,3 +173,12 @@ def delete_user(user_id=None):
         else:
             flash('Check the box to confirm deletion')
     return render_template('delete_user.html', page='Delete User', version=VERSION, form=form, user=user)
+
+
+@dash_app.route('/manage/notices')
+@login_required
+def manage_notices():
+    if current_user.reset_pass is True:
+        return redirect(url_for('change_pass'))
+    notices = Notice.query.all()
+    return render_template('notices-manage.html', page='Manage Notices', version=VERSION, notices=notices)

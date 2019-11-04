@@ -141,7 +141,7 @@ a:link, a:visited {
 }
 
 
-.faction-table, .system-table, .conflict-table, #user-table {
+.tables {
     width: 80%;
     background-color: #333333;
     border: 2px solid black;
@@ -291,8 +291,17 @@ a:link, a:visited {
     width: 100%;
 }
 
+#notice-table {
+    margin-top: 15px;
+}
+
 #user-delete input[type=submit] {
     background-color: #d12a0d;
     border: 2px solid #821704;
     color: #e3e3e3;
+}
+
+#notice-table {
+    margin-left: auto;
+    margin-right: auto;
 }

@@ -2,7 +2,8 @@
 
 {% block manage %}
 <div id="user-list">
-<table id="user-table">
+    <h3>Users</h3>
+<table id="user-table" class="tables">
     {% if current_user.permission == 'Administrator' %}
     <tr class="title-row">
         <td id="username">User</td>

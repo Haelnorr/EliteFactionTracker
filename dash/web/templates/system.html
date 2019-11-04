@@ -4,7 +4,7 @@
 <div id="content">
     {% if system == True %}
     <h2>{{ data[0] }}</h2>
-    <table class="system-table">
+    <table class="system-table tables">
         <tr class="title-row">
             <td>Faction</td>
             <td>Influence</td>
@@ -34,7 +34,7 @@
     {% if data[2]|length == 0 %}
     <p>There are no conflicts to show</p>
     {% else %}
-    <table class="conflict-table">
+    <table class="conflict-table tables">
         <tr class="title-row">
             <td>Faction 1</td>
             <td style="text-align: center;">Score & Stakes</td>
@@ -57,7 +57,7 @@
     {% endif %}
     {% else %}
     <h2>Tracked Systems</h2>
-    <table class="system-table">
+    <table class="system-table tables">
         <tr class="title-row">
             <td>System</td>
             <td>Number of Factions</td>
