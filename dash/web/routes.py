@@ -101,7 +101,7 @@ def change_pass():
 def users():
     if current_user.reset_pass is True:
         return redirect(url_for('change_pass'))
-    user_list = User.query.with_entities(User.username, User.permission, User.id)
+    user_list = User.query.with_entities(User.username, User.permission, User.id).order_by(User.permission)
     return render_template('users.html', page='Users', version=VERSION, users=user_list)
 
 
