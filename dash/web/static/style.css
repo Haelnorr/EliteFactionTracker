@@ -8,6 +8,7 @@ body {
     font-family: "Fira Sans", "Roboto", "Tahoma", "Calibri", sans-serif;
     color: #e3e3e3;
     padding-bottom: 50px;
+    min-width: 1040px;
 }
 
 a:link, a:visited {
@@ -107,6 +108,7 @@ a:link, a:visited {
 
 #index-right {
     float: right;
+    min-width: 500px;
 }
 
 .faction-tile {
@@ -324,4 +326,62 @@ a:link, a:visited {
     background-color: #d12a0d;
     border: 2px solid #821704;
     color: #e3e3e3;
+}
+
+.notice {
+    width: 60%;
+    background-color: #444444;
+    border: 2px solid #171717;
+    margin-top: 15px;
+    border-radius: 5px;
+}
+
+#index-right #faction-tiles {
+    margin-right: 20px;
+}
+
+#index-right #notices {
+    margin-right: 20px;
+}
+
+#index-right .notice {
+    width: 100%;
+    text-align: left;
+}
+
+.notice-title-bar {
+    background-color: #2f2f2f;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    padding: 5px;
+    border-bottom: 1px solid #aaaaaa;
+}
+
+.notice-title {
+    font-weight: bold;
+}
+
+.notice-timestamp {
+    float: right;
+}
+
+.notice-message {
+    padding: 5px;
+    font-size: 15px;
+}
+
+.priority-1, .priority-2, .priority-3 {
+    font-weight: bold;
+}
+
+.priority-1 {
+    color: #d12a0d;
+}
+
+.priority-2 {
+    color: #eb9c00;
+}
+
+.priority-3 {
+    color: #02a63e;
 }

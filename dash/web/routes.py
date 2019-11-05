@@ -5,7 +5,8 @@ from .. import datafetch
 from flask_login import current_user, login_user, logout_user, login_required
 from .models import User, Notice
 from werkzeug.urls import url_parse
-from datetime import time, datetime, date
+from datetime import time, datetime
+from sqlalchemy import or_
 
 
 @dash_app.route('/index')
@@ -20,7 +21,8 @@ def dashboard():
     alert_list = alert_data[0]
     alert_count = (alert_data[1], len(alert_list))
     factions = datafetch.get_tracked_factions()
-    return render_template('index.html', page='Dashboard', version=VERSION, alerts=alert_list, alert_count=alert_count, factions=factions)
+    notice_list = Notice.query.filter(or_(Notice.expiry > datetime.utcnow(), None == Notice.expiry)).filter(Notice.priority == 1)
+    return render_template('index.html', page='Dashboard', version=VERSION, alerts=alert_list, alert_count=alert_count, factions=factions, notices=notice_list)
 
 
 @dash_app.route('/faction')
@@ -259,3 +261,9 @@ def delete_notice(notice_id=None):
         else:
             flash('Check the box to confirm deletion')
     return render_template('notices_delete.html', page='Delete Notice', version=VERSION, form=form, notice=notice)
+
+
+@dash_app.route('/notices')
+def notices():
+    notice_list = Notice.query.filter(or_(Notice.expiry > datetime.utcnow(), None == Notice.expiry)).order_by(Notice.priority)
+    return render_template('notices.html', page='Notices', version=VERSION, notices=notice_list)

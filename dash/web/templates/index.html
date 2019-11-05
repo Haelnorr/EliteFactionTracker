@@ -23,16 +23,46 @@
         {% endif %}
     </div>
     <div id="index-right">
-        <h4>Tracked Factions</h4>
-        {% for faction in factions %}
-        <div class="faction-tile">
-            <a href="{{ url_for('faction', fac_id=faction['id']) }}">{{ faction["name"] }}</a>
-            <span>Systems: {{ faction["systems"] }}</span>
-            <span>Controlling: {{ faction["controlling"] }}</span>
-            <span>Conflicts: {{ faction["conflicts"] }}</span>
-            <span>Expansion: {{ faction["expansion"] }}</span>
+        <div id="faction-tiles">
+            <h4>Tracked Factions</h4>
+            {% for faction in factions %}
+            <div class="faction-tile">
+                <a href="{{ url_for('faction', fac_id=faction['id']) }}">{{ faction["name"] }}</a>
+                <span>Systems: {{ faction["systems"] }}</span>
+                <span>Controlling: {{ faction["controlling"] }}</span>
+                <span>Conflicts: {{ faction["conflicts"] }}</span>
+                <span>Expansion: {{ faction["expansion"] }}</span>
+            </div>
         </div>
         {% endfor %}
+        <hr>
+        <div id="notices">
+            <h4>High Priority Notices</h4>
+            <a href="{{ url_for('notices') }}">View all notices</a>
+            {% for notice in notices %}
+                <div class="notice">
+                    <div class="notice-title-bar">
+                        <span class="notice-title">{{ notice.title }}</span><br>
+                        <span>Priority:
+                            <span class="priority-{{ notice.priority }}">
+                                {% if notice.priority == 1 %}
+                                High
+                                {% elif notice.priority == 2 %}
+                                Medium
+                                {% else %}
+                                Low
+                                {% endif %}
+                            </span>
+                            {% if not notice.expiry == None %}
+                             -- Expires: {{ notice.expiry|date }}
+                            {% endif %}
+                        </span>
+                        <span class="notice-timestamp">Posted on: {{ notice.timestamp|datetime }}</span>
+                    </div>
+                    <div class="notice-message">{{ notice.message }}</div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 </div>
 {% endblock %}
