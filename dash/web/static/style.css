@@ -306,11 +306,16 @@ a:link, a:visited {
     margin-right: auto;
 }
 
-#notice-new {
+#notice-new, #notice-edit {
     width: 600px;
 }
 
 #notice-new #message {
+    width: 580px;
+    height: 150px;
+}
+
+#notice-edit #message {
     width: 580px;
     height: 150px;
 }

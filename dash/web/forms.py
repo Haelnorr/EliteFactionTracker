@@ -68,6 +68,20 @@ class NewNotice(FlaskForm):
     submit = SubmitField('Create Notice')
 
 
+class EditNotice(FlaskForm):
+    __choices = [
+        (1, 'High'),
+        (2, 'Medium'),
+        (3, 'Low')
+    ]
+    post_title = StringField('Title', validators=[DataRequired()])
+    priority = SelectField('Priority', coerce=int, choices=__choices, default=3)
+    expiry_enable = BooleanField('Set to expire')
+    expiry = DateField('Expiry', format='%Y-%m-%d')
+    message = TextAreaField('Message', validators=[DataRequired()])
+    submit = SubmitField('Edit Notice')
+
+
 class DeleteNotice(FlaskForm):
     confirm = BooleanField('Confirm')
     submit = SubmitField('Delete Notice')

@@ -1,8 +1,8 @@
 """notices table
 
-Revision ID: 39bfc37094ad
+Revision ID: 4c3c7ec84827
 Revises: 683974c8b543
-Create Date: 2019-11-04 16:23:40.153898
+Create Date: 2019-11-05 15:35:43.193044
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '39bfc37094ad'
+revision = '4c3c7ec84827'
 down_revision = '683974c8b543'
 branch_labels = None
 depends_on = None

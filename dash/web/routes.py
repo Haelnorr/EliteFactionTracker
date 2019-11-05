@@ -5,7 +5,7 @@ from .. import datafetch
 from flask_login import current_user, login_user, logout_user, login_required
 from .models import User, Notice
 from werkzeug.urls import url_parse
-from datetime import time, datetime
+from datetime import time, datetime, date
 
 
 @dash_app.route('/index')
@@ -202,12 +202,49 @@ def new_notice():
     return render_template('notices_new.html', page='New Notice', version=VERSION, form=form)
 
 
+@dash_app.route('/manage/notices/edit')
+@dash_app.route('/manage/notices/edit/<notice_id>', methods=['GET', 'POST'])
+@login_required
+def edit_notice(notice_id=None):
+    if current_user.reset_pass is True:
+        return redirect(url_for('change_pass'))
+    if notice_id is None:
+        return redirect(url_for('manage_notices'))
+    notice = Notice.query.filter_by(id=notice_id).first()
+    if notice is None:
+        return redirect(url_for('manage_notices'))
+    if not current_user.id == notice.author.id:
+        return redirect(url_for('manage_notices'))
+    if notice.expiry is None:
+        form = forms.EditNotice(post_title=notice.title, expiry_enable=False, priority=notice.priority, message=notice.message)
+    else:
+        expiry = notice.expiry.date()
+        form = forms.EditNotice(post_title=notice.title, expiry_enable=True, priority=notice.priority, expiry=expiry, message=notice.message)
+
+    if form.validate_on_submit():
+        if form.expiry_enable.data is True:
+            expiry = datetime.combine(form.expiry.data, time(12))
+        else:
+            expiry = None
+        notice.title = form.post_title.data
+        notice.priority = form.priority.data
+        notice.expiry = expiry
+        notice.message = form.message.data
+        notice.timestamp = datetime.utcnow()
+        db.session.add(notice)
+        db.session.commit()
+        return redirect(url_for('manage_notices'))
+    return render_template('notices_edit.html', page='Edit Notice', version=VERSION, form=form)
+
+
 @dash_app.route('/manage/notices/delete')
 @dash_app.route('/manage/notices/delete/<notice_id>', methods=['GET', 'POST'])
 @login_required
 def delete_notice(notice_id=None):
     if current_user.reset_pass is True:
         return redirect(url_for('change_pass'))
+    if notice_id is None:
+        return redirect(url_for('manage_notices'))
     notice = Notice.query.filter_by(id=notice_id).first()
     if notice is None:
         return redirect(url_for('manage_notices'))
