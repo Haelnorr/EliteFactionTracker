@@ -25,6 +25,11 @@ def dashboard():
     return render_template('index.html', page='Dashboard', version=VERSION, alerts=alert_list, alert_count=alert_count, factions=factions, notices=notice_list)
 
 
+@dash_app.route('/about')
+def about():
+    return render_template('about.html', page='About', version=VERSION)
+
+
 @dash_app.route('/faction')
 @dash_app.route('/faction/<fac_id>')
 def faction(fac_id=None):

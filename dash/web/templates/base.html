@@ -7,39 +7,56 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div id="title">
-        <div id="title-left">
-            <span>Elite: Dangerous Faction Tracker</span>
+    <div id="page-content">
+        <div id="title">
+            <div id="title-left">
+                <span>Elite: Dangerous Faction Tracker</span>
+            </div>
+            {% if current_user.is_anonymous == False %}
+            <div id="title-right">
+                <span>Logged in as:<br>{{ current_user.username }}</span>
+            </div>
+            {% endif %}
         </div>
-        <div id="title-right">
-            <span>BY CMDR HAELNORR<br>version  {{ version }}</span>
+        <div id="nav">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('system') }}">Systems</a>
+            <a href="{{ url_for('faction') }}">Factions</a>
+            <a href="{{ url_for('notices') }}">Notices</a>
+            <div id="manage">
+            {% if current_user.is_anonymous %}
+            <a href="{{ url_for('manage') }}">Manage</a>
+            {% else %}
+            <a href="{{ url_for('manage') }}">Manage</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+            {% endif %}
+            </div>
         </div>
-    </div>
-    <div id="nav">
-        <a href="{{ url_for('dashboard') }}">Dashboard</a>
-        <a href="{{ url_for('system') }}">Systems</a>
-        <a href="{{ url_for('faction') }}">Factions</a>
-        <a href="{{ url_for('notices') }}">Notices</a>
-        <div id="manage">
-        {% if current_user.is_anonymous %}
-        <a href="{{ url_for('manage') }}">Manage</a>
-        {% else %}
-        <a href="{{ url_for('manage') }}">Manage</a>
-        <a href="{{ url_for('logout') }}">Logout</a>
-        {% endif %}
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <ul>
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        {% endwith %}
+        <div id="main">
+        {% block content %}{% endblock %}
         </div>
-    </div>
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <ul>
-            {% for message in messages %}
-            <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-    {% endwith %}
-    <div id="main">
-    {% block content %}{% endblock %}
-    </div>
+</div>
+    <footer>
+        <div id="footer-pad"></div>
+        <div id="footer-content">
+            Elite: Dangerous Faction Tracker (EliteFactionTracker) - Version {{ version }} - © Haelnorr 2019<br>
+            <a href="https://github.com/Haelnorr/EliteFactionTracker">GitHub</a> |
+            <a href="https://github.com/Haelnorr/EliteFactionTracker/issues/new">Report a Bug</a> |
+            <a href="{{ url_for('about') }}">About</a>
+            <br><br>
+            <a href="https://www.elitedangerous.com/">Elite: Dangerous</a> © 2012, 2013 Frontier Developments plc. All rights reserved.<br>
+            This is not an official tool for the game Elite: Dangerous and is not affiliated with Frontier Developments.
+
+        </div>
+    </footer>
 </body>
 </html>

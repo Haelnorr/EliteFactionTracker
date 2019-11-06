@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="content">
+    <h2>About</h2>
+    <h4>What is Elite: Dangerous Faction Tracker?</h4>
+    <p class="about-p">
+        Elite: Dangerous Faction tracker (EDFT) is a tool for tracking the state of the Background Simulation (BGS)
+        in the game Elite: Dangerous for specific designated factions. It comprises of a background application
+        retrieving data from EDDN, and a website dashboard to view the data.<br>
+        The Dashboard generates notices based on the influence levels and states of the factions present in the tracked
+        systems, and managers can post notices with varying priority levels.<br>
+        <br>
+        It was developed by CMDR Haelnorr for the use of the Angels of Death Clan (Elite: Dangerous division), but can be
+        distributed and used under the GNU General Public License v3.0.
+    </p>
+    <h4>Acknowledgements</h4>
+    <p class="about-p">
+        The making of this project would not have been possible without the help of many, and the tools they have made.<br>
+        It would also not have been made at all without the game itself - Elite: Dangerous.<br>
+        To name a few:<br>
+        <ul>
+            <li>The Elite: Dangerous Community Developers, for their valuable technical support and help with brainstorming</li>
+            <li>AnthorNet, the author of EDDN, for the network that provides the data this project and many other use</li>
+            <li>Garud, the author of EliteBGS API, which this tool uses for data-on-request</li>
+        </ul>
+    </p>
+    <h4>Links</h4>
+    <ul>
+        <li><a href="https://github.com/Haelnorr/EliteFactionTracker">EDFT GitHub</a></li>
+        <li><a href="https://www.elitedangerous.com/">Elite: Dangerous</a> and <a href="https://www.frontier.co.uk/">Frontier Developments</a></li>
+        <li><a href="https://edcd.github.io/">Elite: Dangerous Community Developers (EDCD)</a></li>
+        <li><a href="https://github.com/EDSM-NET/EDDN/wiki">Elite: Dangerous Data Network (EDDN)</a></li>
+        <li><a href="https://elitebgs.app/">EliteBGS</a></li>
+        <li><a href="https://www.clanaod.net/">The Angels of Death</a></li>
+    </ul>
+</div>
+{% endblock %}

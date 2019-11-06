@@ -1,5 +1,6 @@
 html, body {
     min-height: 100%;
+    height: 100%;
 }
 
 body {
@@ -7,8 +8,12 @@ body {
     background-color: #212121;
     font-family: "Fira Sans", "Roboto", "Tahoma", "Calibri", sans-serif;
     color: #e3e3e3;
-    padding-bottom: 50px;
-    min-width: 1040px;
+    display: flex;
+    flex-direction: column;
+}
+
+#page-content {
+    flex: 1 0 auto;
 }
 
 a:link, a:visited {
@@ -78,17 +83,43 @@ a:link, a:visited {
     background-color: #212121;
 }
 
+footer {
+    flex-shrink: 0;
+    background-color: #171717;
+}
+
+#footer-pad {
+    width: 100%;
+    height: 60px;
+    box-shadow: 0 10px 10px 0 #090909;
+    background-color: #212121;
+}
+
+#footer-content {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 14px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+#footer-content a {
+    font-weight: bold;
+}
+
 #manage {
     margin-left: auto;
     float: right;
 }
 
-#main {
-    height: 100%;
-}
-
 #content {
     padding-left: 30px;
+}
+
+.about-p {
+    max-width: 65%;
 }
 
 #index {
