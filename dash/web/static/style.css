@@ -1,6 +1,7 @@
 html, body {
-    min-height: 100%;
-    height: 100%;
+    min-height: 100vh;
+    height: 100vh;
+    min-width: 1060px;
 }
 
 body {
@@ -14,6 +15,16 @@ body {
 
 #page-content {
     flex: 1 0 auto;
+}
+
+#watermark {
+    position: fixed;
+    opacity: 0.3;
+    max-height: calc(100vh - 250px);
+    max-width: 100vw;
+    z-index: -10;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 a:link, a:visited {
@@ -86,18 +97,19 @@ a:link, a:visited {
 footer {
     flex-shrink: 0;
     background-color: #171717;
+    margin-top: 50px;
 }
 
 #footer-pad {
     width: 100%;
-    height: 60px;
+    height: 10px;
     box-shadow: 0 10px 10px 0 #090909;
     background-color: #212121;
 }
 
 #footer-content {
     width: 100%;
-    height: 100%;
+    height: 85px;
     text-align: center;
     vertical-align: middle;
     font-size: 14px;
@@ -146,7 +158,8 @@ footer {
     padding: 10px;
     border: 3px solid #171717;
     border-radius: 5px;
-    background-color: #2f2f2f;
+    background-color: rgb(47, 47, 47);
+    background-color: rgb(47, 47, 47, 0.7);
     display: inline-block;
     min-width: 175px;
 }
@@ -176,7 +189,8 @@ footer {
 
 .tables {
     width: 80%;
-    background-color: #333333;
+    background-color: rgb(51, 51, 51);
+    background-color: rgba(51, 51, 51, 0.7);
     border: 2px solid black;
     border-collapse: collapse;
 }
@@ -192,7 +206,8 @@ footer {
 }
 
 .content-row:nth-child(even) {
-    background-color: #444444;
+    background-color: rgb(68, 68, 68);
+    background-color: rgba(90, 90, 90, 0.5);
 }
 
 .content-row {
@@ -240,7 +255,8 @@ footer {
 }
 
 .forms {
-  background-color: #313131;
+  background-color: rgb(49, 49, 49);
+  background-color: rgba(49, 49, 49, 0.7);
   width: 300px;
   text-align: center;
   padding: 10px;
@@ -361,7 +377,8 @@ footer {
 
 .notice {
     width: 60%;
-    background-color: #444444;
+    background-color: rgb(68, 68, 68);
+    background-color: rgba(68, 68, 68, 0.7);
     border: 2px solid #171717;
     margin-top: 15px;
     border-radius: 5px;

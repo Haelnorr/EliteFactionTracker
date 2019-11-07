@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ page }} - EDFT</title>
+    {% if icon %}
     <link rel="shortcut icon" href="{{ url_for('static', filename='icon.ico') }}">
+    {% endif %}
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -25,7 +27,7 @@
             <a href="{{ url_for('notices') }}">Notices</a>
             <div id="manage">
             {% if current_user.is_anonymous %}
-            <a href="{{ url_for('manage') }}">Manage</a>
+            <a href="{{ url_for('login') }}">Manage</a>
             {% else %}
             <a href="{{ url_for('manage') }}">Manage</a>
             <a href="{{ url_for('logout') }}">Logout</a>
@@ -42,7 +44,10 @@
             {% endif %}
         {% endwith %}
         <div id="main">
-        {% block content %}{% endblock %}
+            {% if watermark %}
+            <img id="watermark" src="{{ url_for('static', filename='watermark.svg') }}">
+            {% endif %}
+            {% block content %}{% endblock %}
         </div>
 </div>
     <footer>

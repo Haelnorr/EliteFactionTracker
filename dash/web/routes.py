@@ -1,12 +1,21 @@
 from flask import render_template, redirect, flash, url_for, request
 from . import dash_app, db, forms
-from ...definitions import VERSION
+from ...definitions import VERSION, ROOT_DIR
 from .. import datafetch
 from flask_login import current_user, login_user, logout_user, login_required
 from .models import User, Notice
 from werkzeug.urls import url_parse
 from datetime import time, datetime
 from sqlalchemy import or_
+import os.path
+
+icon = os.path.isfile(os.path.join(ROOT_DIR, 'dash', 'web', 'static', 'icon.ico'))
+watermark = os.path.isfile(os.path.join(ROOT_DIR, 'dash', 'web', 'static', 'watermark.svg'))
+
+
+@dash_app.context_processor
+def inject_global_vars():
+    return dict(version=VERSION, icon=icon, watermark=watermark)
 
 
 @dash_app.route('/index')
@@ -22,12 +31,12 @@ def dashboard():
     alert_count = (alert_data[1], len(alert_list))
     factions = datafetch.get_tracked_factions()
     notice_list = Notice.query.filter(or_(Notice.expiry > datetime.utcnow(), None == Notice.expiry)).filter(Notice.priority == 1)
-    return render_template('index.html', page='Dashboard', version=VERSION, alerts=alert_list, alert_count=alert_count, factions=factions, notices=notice_list)
+    return render_template('index.html', page='Dashboard', alerts=alert_list, alert_count=alert_count, factions=factions, notices=notice_list)
 
 
 @dash_app.route('/about')
 def about():
-    return render_template('about.html', page='About', version=VERSION)
+    return render_template('about.html', page='About')
 
 
 @dash_app.route('/faction')
@@ -35,10 +44,10 @@ def about():
 def faction(fac_id=None):
     if fac_id is not None:
         faction_data = datafetch.get_faction(fac_id)
-        template = render_template('faction.html', page='Factions', version=VERSION, faction=True, data=faction_data)
+        template = render_template('faction.html', page='Factions', faction=True, data=faction_data)
     else:
         factions = datafetch.get_all_factions()
-        template = render_template('faction.html', page='Factions', version=VERSION, faction=False, data=factions)
+        template = render_template('faction.html', page='Factions', faction=False, data=factions)
     return template
 
 
@@ -47,10 +56,10 @@ def faction(fac_id=None):
 def system(sys_id=None):
     if sys_id is not None:
         system_data = datafetch.get_system(sys_id)
-        template = render_template('system.html', page='Systems', version=VERSION, system=True, data=system_data)
+        template = render_template('system.html', page='Systems', system=True, data=system_data)
     else:
         systems = datafetch.get_all_systems()
-        template = render_template('system.html', page='Systems', version=VERSION, system=False, data=systems)
+        template = render_template('system.html', page='Systems', system=False, data=systems)
     return template
 
 
@@ -77,7 +86,7 @@ def login():
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('manage')
         return redirect(next_page)
-    return render_template('login.html', page='Login', version=VERSION, form=form)
+    return render_template('login.html', page='Login', form=form)
 
 
 @dash_app.route('/manage/logout')
@@ -100,7 +109,7 @@ def change_pass():
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('manage'))
-    return render_template('change_pass.html', page='Change Password', version=VERSION, form=form)
+    return render_template('change_pass.html', page='Change Password', form=form)
 
 
 @dash_app.route('/manage/users')
@@ -109,7 +118,7 @@ def users():
     if current_user.reset_pass is True:
         return redirect(url_for('change_pass'))
     user_list = User.query.with_entities(User.username, User.permission, User.id).order_by(User.permission)
-    return render_template('users.html', page='Users', version=VERSION, users=user_list)
+    return render_template('users.html', page='Users', users=user_list)
 
 
 @dash_app.route('/manage/users/edit')
@@ -135,7 +144,7 @@ def user_edit(user_id=None):
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('users'))
-    return render_template('users_edit.html', page='Edit User', version=VERSION, user=user, current_user=current_user, form=form)
+    return render_template('users_edit.html', page='Edit User', user=user, current_user=current_user, form=form)
 
 
 @dash_app.route('/manage/users/add', methods=['GET', 'POST'])
@@ -179,7 +188,7 @@ def delete_user(user_id=None):
             return redirect(url_for('users'))
         else:
             flash('Check the box to confirm deletion')
-    return render_template('users_delete.html', page='Delete User', version=VERSION, form=form, user=user)
+    return render_template('users_delete.html', page='Delete User', form=form, user=user)
 
 
 @dash_app.route('/manage/notices')
@@ -188,7 +197,7 @@ def manage_notices():
     if current_user.reset_pass is True:
         return redirect(url_for('change_pass'))
     notices = Notice.query.order_by(Notice.priority)
-    return render_template('notices_manage.html', page='Manage Notices', version=VERSION, notices=notices)
+    return render_template('notices_manage.html', page='Manage Notices', notices=notices)
 
 
 @dash_app.route('/manage/notices/new', methods=['GET', 'POST'])
@@ -206,7 +215,7 @@ def new_notice():
         db.session.add(notice)
         db.session.commit()
         return redirect(url_for('manage_notices'))
-    return render_template('notices_new.html', page='New Notice', version=VERSION, form=form)
+    return render_template('notices_new.html', page='New Notice', form=form)
 
 
 @dash_app.route('/manage/notices/edit')
@@ -241,7 +250,7 @@ def edit_notice(notice_id=None):
         db.session.add(notice)
         db.session.commit()
         return redirect(url_for('manage_notices'))
-    return render_template('notices_edit.html', page='Edit Notice', version=VERSION, form=form)
+    return render_template('notices_edit.html', page='Edit Notice', form=form)
 
 
 @dash_app.route('/manage/notices/delete')
@@ -265,10 +274,10 @@ def delete_notice(notice_id=None):
             return redirect(url_for('manage_notices'))
         else:
             flash('Check the box to confirm deletion')
-    return render_template('notices_delete.html', page='Delete Notice', version=VERSION, form=form, notice=notice)
+    return render_template('notices_delete.html', page='Delete Notice', form=form, notice=notice)
 
 
 @dash_app.route('/notices')
 def notices():
     notice_list = Notice.query.filter(or_(Notice.expiry > datetime.utcnow(), None == Notice.expiry)).order_by(Notice.priority)
-    return render_template('notices.html', page='Notices', version=VERSION, notices=notice_list)
+    return render_template('notices.html', page='Notices', notices=notice_list)
