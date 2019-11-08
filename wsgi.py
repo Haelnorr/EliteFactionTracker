@@ -1,5 +1,9 @@
 from . import log
 log.start('dashboard')
+from dotenv import load_dotenv
+from .definitions import ROOT_DIR
+import os
+load_dotenv(os.path.join(ROOT_DIR, '.env'))
 from .dash.web import dash_app as app
 from .dash.web import db
 from .dash.web.models import User, Notice
