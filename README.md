@@ -14,9 +14,9 @@ For detailed information on how to download and setup this tool yourself, visit 
 The making of this project would not have been possible without the help of many, and the tools they have made.
 It would also not have been made at all without the game itself - Elite: Dangerous.  
 To name a few:  
-The Elite: Dangerous Community Developers, for their valuable technical support and help with brainstorming
-AnthorNet, the author of EDDN, for the network that provides the data this project and many other use
-Garud, the author of EliteBGS API, which this tool uses for data-on-request
+- The Elite: Dangerous Community Developers, for their valuable technical support and help with brainstorming
+- AnthorNet, the author of EDDN, for the network that provides the data this project and many other use
+- Garud, the author of EliteBGS API, which this tool uses for data-on-request
 ##### Links:  
  - [Elite: Dangerous](https://www.elitedangerous.com/) and [Frontier Developments](https://www.frontier.co.uk/)
  - [Elite: Dangerous Community Developers (EDCD)](https://edcd.github.io/)
