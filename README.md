@@ -1,7 +1,7 @@
 # EliteFactionTracker
 ## What is Elite: Dangerous Faction Tracker?  
 Elite: Dangerous Faction tracker (EDFT) is a tool for tracking the state of the Background Simulation (BGS) in the game Elite: Dangerous for specific designated factions. It comprises of a background application retrieving data from EDDN, and a website dashboard to view the data.
-The Dashboard generates notices based on the influence levels and states of the factions present in the tracked systems, and managers can post notices with varying priority levels.
+The Dashboard generates alerts based on the influence levels and states of the factions present in the tracked systems, and managers can post notices with varying priority levels.
 
 It was developed by CMDR Haelnorr for the use of the Angels of Death Clan (Elite: Dangerous division), but can be distributed and used under the GNU General Public License v3.0.
 
