@@ -18,9 +18,8 @@ The Elite: Dangerous Community Developers, for their valuable technical support 
 AnthorNet, the author of EDDN, for the network that provides the data this project and many other use
 Garud, the author of EliteBGS API, which this tool uses for data-on-request
 ##### Links:  
- - [EDFT GitHub](https://github.com/Haelnorr/EliteFactionTracker)
  - [Elite: Dangerous](https://www.elitedangerous.com/) and [Frontier Developments](https://www.frontier.co.uk/)
  - [Elite: Dangerous Community Developers (EDCD)](https://edcd.github.io/)
- - [Elite: Dangerous Data Network (EDDN)]
+ - [Elite: Dangerous Data Network (EDDN)](https://github.com/EDSM-NET/EDDN/wiki)
  - [EliteBGS](https://elitebgs.app/)
  - [The Angels of Death](https://www.clanaod.net/)
