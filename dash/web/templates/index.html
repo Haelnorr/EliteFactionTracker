@@ -13,9 +13,11 @@
             <h5><a href="{{ url_for('faction', fac_id=faction['id']) }}">{{ faction["name"] }}</a></h5>
                 {% for alert in faction["alerts"] %}
                 <div>
+                    {% if alert[1] != "info" or current_user.is_anonymous == False %}
                     <div class="alert-{{ alert[1] }}">
                         {{ alert[0] }}
                     </div>
+                    {% endif %}
                 </div>
                 {% endfor %}
         </div>
