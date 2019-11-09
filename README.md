@@ -7,7 +7,7 @@ It was developed by CMDR Haelnorr for the use of the Angels of Death Clan (Elite
 
 ## How Can I Use It?
 Since the tracker relies on always listening to the relay for data, and also runs a webpage, it is not a client-side application and as such needs to be hosted.  
-For detailed information on how to download and setup this tool yourself, [visit the wiki](wiki).
+For detailed information on how to download and setup this tool yourself, [visit the wiki](https://github.com/Haelnorr/EliteFactionTracker/wiki).
 
 
 ### Acknowledgements  
