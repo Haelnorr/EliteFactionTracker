@@ -1,0 +1,13 @@
+[Unit]
+Description=ED Faction Tracker Dashboard
+After=network.target
+
+[Service]
+User=user
+Group=www-data
+WorkingDirectory=/home/user/edft
+Environment="PATH=/home/user/edft/venv/bin"
+ExecStart=/home/user/edft/venv/bin/gunicorn --workers 3 EliteFactionTracker.wsgi:app
+
+[Install]
+WantedBy=multi-user.target
