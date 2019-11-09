@@ -1,0 +1,42 @@
+{% extends "manage.html" %}
+
+{% block manage %}
+<div id="user-list">
+    <h3>Users</h3>
+<table id="user-table" class="tables">
+    {% if current_user.permission == 'Administrator' %}
+    <tr class="title-row">
+        <td id="username">User</td>
+        <td id="permission">Permission</td>
+        <td id="reset">Modify</td>
+    </tr>
+    {% for user in users %}
+        {% if user.id != 1 or current_user.id == 1 %}
+        <tr class="content-row">
+            <td>{{ user.username }}</td>
+            <td>{{ user.permission }}</td>
+            <td>
+                {% if current_user.id == user.id %}
+                    <a href="{{ url_for('change_pass') }}">Change Password</a>
+                {% elif current_user.id == 1 or current_user.id != 1 and user.permission == 'Manager' %}
+                    <a href="{{ url_for('user_edit', user_id=user.id) }}">Edit</a> | <a href="{{ url_for('delete_user', user_id=user.id) }}">Delete</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endif %}
+    {% endfor %}
+    <tr class="content-row">
+        <td></td>
+        <td><a href="{{ url_for('add_user') }}">Add user</a></td>
+        <td></td>
+    </tr>
+    {% else %}
+        <tr class="content-row">
+            <td>
+                <a href="{{ url_for('change_pass') }}">Change Password</a>
+            </td>
+        </tr>
+    {% endif %}
+</table>
+</div>
+{% endblock %}

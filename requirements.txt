@@ -1,0 +1,11 @@
+wheel
+requests
+zmq
+simplejson
+gunicorn
+flask
+flask-wtf
+flask-sqlalchemy
+flask-migrate
+flask-login
+python-dotenv

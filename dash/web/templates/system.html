@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div>
+<div id="content">
     {% if system == True %}
     <h2>{{ data[0] }}</h2>
-    <table class="system-table">
+    <table class="system-table tables">
         <tr class="title-row">
             <td>Faction</td>
             <td>Influence</td>
@@ -16,12 +16,12 @@
         </tr>
         {% for faction in data[1] %}
         <tr class="content-row">
-            <td><a href='/faction/{{ faction["id"] }}'>{{ faction["name"] }}</a></td>
+            <td><a href="{{ url_for('faction', fac_id=faction['id']) }}">{{ faction["name"] }}</a></td>
             <td>{{ faction["influence1"] }}</td>
             {% if faction["home_system"]["name"] == None %}
             <td>Not tracked</td>
             {% else %}
-            <td><a href='/system/{{ faction["home_system"]["id"] }}'>{{ faction["home_system"]["name"] }}</a></td>
+            <td><a href="{{ url_for('system', sys_id=faction['home_system']['id']) }}">{{ faction["home_system"]["name"] }}</a></td>
             {% endif %}
             <td>{{ faction["expansion"] }}</td>
             <td>{{ faction["conflict"] }}</td>
@@ -34,7 +34,7 @@
     {% if data[2]|length == 0 %}
     <p>There are no conflicts to show</p>
     {% else %}
-    <table class="conflict-table">
+    <table class="conflict-table tables">
         <tr class="title-row">
             <td>Faction 1</td>
             <td style="text-align: center;">Score & Stakes</td>
@@ -57,7 +57,7 @@
     {% endif %}
     {% else %}
     <h2>Tracked Systems</h2>
-    <table class="system-table">
+    <table class="system-table tables">
         <tr class="title-row">
             <td>System</td>
             <td>Number of Factions</td>
@@ -65,7 +65,7 @@
         </tr>
         {% for sys in data %}
         <tr class="content-row">
-            <td><a href='/system/{{ sys["id"] }}'>{{ sys["name"] }}</a></td>
+            <td><a href="{{ url_for('system', sys_id=sys['id']) }}">{{ sys["name"] }}</a></td>
             <td>{{ sys["num_factions"] }}</td>
             <td>{{ sys["updated"] }}</td>
         </tr>

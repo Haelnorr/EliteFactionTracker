@@ -1,34 +1,70 @@
 {% extends "base.html" %}
 {% block content %}
-<div>
+<div id="index">
     <h2>Dashboard</h2>
-    <h4>Tracked Factions</h4>
-    {% for faction in factions %}
-    <div class="faction-tile">
-        <a href='/faction/{{ faction["id"] }}'>{{ faction["name"] }}</a>
-        <span>Systems: {{ faction["systems"] }}</span>
-        <span>Controlling: {{ faction["controlling"] }}</span>
-        <span>Conflicts: {{ faction["conflicts"] }}</span>
-        <span>Expansion: {{ faction["expansion"] }}</span>
-    </div>
-    {% endfor %}
-    <h4>Alerts</h4>
-    {% if alert_count[0] == 0 %}
-    <h5>There are no alerts</h5>
-    {% else %}
-    <p>There are {{ alert_count[0] }} alerts for {{ alert_count[1] }} factions</p>
-    {% for faction in alerts %}
-    <div class="alert-block">
-        <h5><a href='/faction/{{ faction["id"] }}'>{{ faction["name"] }}</a></h5>
-            {% for alert in faction["alerts"] %}
-            <div>
-                <div class="alert-{{ alert[1] }}">
-                    {{ alert[0] }}
+    <div id="index-left">
+        <h4>Alerts</h4>
+        {% if alert_count[0] == 0 %}
+        <h5>There are no alerts</h5>
+        {% else %}
+        <p>There are {{ alert_count[0] }} alerts for {{ alert_count[1] }} factions</p>
+        {% for faction in alerts %}
+        <div class="alert-block">
+            <h5><a href="{{ url_for('faction', fac_id=faction['id']) }}">{{ faction["name"] }}</a></h5>
+                {% for alert in faction["alerts"] %}
+                <div>
+                    {% if alert[1] != "info" or current_user.is_anonymous == False %}
+                    <div class="alert-{{ alert[1] }}">
+                        {{ alert[0] }}
+                    </div>
+                    {% endif %}
                 </div>
-            </div>
-            {% endfor %}
+                {% endfor %}
+        </div>
+        {% endfor %}
+        {% endif %}
     </div>
-    {% endfor %}
-    {% endif %}
+    <div id="index-right">
+        <div id="faction-tiles">
+            <h4>Tracked Factions</h4>
+            {% for faction in factions %}
+            <div class="faction-tile">
+                <a href="{{ url_for('faction', fac_id=faction['id']) }}">{{ faction["name"] }}</a>
+                <span>Systems: {{ faction["systems"] }}</span>
+                <span>Controlling: {{ faction["controlling"] }}</span>
+                <span>Conflicts: {{ faction["conflicts"] }}</span>
+                <span>Expansion: {{ faction["expansion"] }}</span>
+            </div>
+        {% endfor %}
+        </div>
+        <hr>
+        <div id="notices">
+            <h4>High Priority Notices</h4>
+            <a href="{{ url_for('notices') }}">View all notices</a>
+            {% for notice in notices %}
+                <div class="notice">
+                    <div class="notice-title-bar">
+                        <span class="notice-title">{{ notice.title }}</span><br>
+                        <span>Priority:
+                            <span class="priority-{{ notice.priority }}">
+                                {% if notice.priority == 1 %}
+                                High
+                                {% elif notice.priority == 2 %}
+                                Medium
+                                {% else %}
+                                Low
+                                {% endif %}
+                            </span>
+                            {% if not notice.expiry == None %}
+                             -- Expires: {{ notice.expiry|date }}
+                            {% endif %}
+                        </span>
+                        <span class="notice-timestamp">Posted on: {{ notice.timestamp|datetime }}</span>
+                    </div>
+                    <div class="notice-message">{{ notice.message }}</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 </div>
 {% endblock %}

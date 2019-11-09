@@ -1,0 +1,15 @@
+[Unit]
+Description=ED Faction Tracker
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=user
+WorkingDirectory=/home/user/edft
+ExecStart=/usr/bin/python3 -m EliteFactionTracker.run
+
+[Install]
+WantedBy=multi-user.target

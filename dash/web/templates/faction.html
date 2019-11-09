@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div>
+<div id="content">
     {% if faction == True %}
     <h2>{{ data[0] }}</h2>
-    <table class="faction-table">
+    <table class="faction-table tables">
         <tr class="title-row">
             <td>System</td>
             <td>Influence</td>
@@ -13,7 +13,7 @@
         </tr>
         {% for system in data[1] %}
         <tr class="content-row">
-            <td><a href='/system/{{ system["id"] }}'>{{ system["name"] }}</a></td>
+            <td><a href="{{ url_for('system', sys_id=system['id']) }}">{{ system["name"] }}</a></td>
             <td>{{ system["influence"] }}</td>
             <td>
                 {% if system["states"]|length == 0 %}
@@ -32,7 +32,7 @@
     {% if data[2]|length == 0 %}
     <p>There are no conflicts to show</p>
     {% else %}
-    <table class="conflict-table">
+    <table class="conflict-table tables">
         <tr class="title-row">
             <td>System</td>
             <td>Stake at Risk</td>
@@ -45,10 +45,10 @@
         </tr>
         {% for conflict in data[2] %}
         <tr class="content-row">
-            <td><a href='/system/{{ conflict["system_id"] }}'>{{ conflict["system_name"] }}</a></td>
+            <td><a href="{{ url_for('system', sys_id=conflict['system_id']) }}">{{ conflict["system_name"] }}</a></td>
             <td>{{ conflict["stake_at_risk"] }}</td>
             <td>{{ conflict["score"] }}</td>
-            <td><a href='/faction/{{ conflict["opponent_id"] }}'>{{ conflict["opponent"] }}</a></td>
+            <td><a href="{{ url_for('faction', fac_id=conflict['opponent_id']) }}">{{ conflict["opponent"] }}</a></td>
             <td>{{ conflict["stake_to_win"] }}</td>
             <td>{{ conflict["stage"] }}</td>
             <td>{{ conflict["date_started"] }}</td>
@@ -59,27 +59,27 @@
     {% endif %}
     {% else %}
     <h2>Tracked Factions</h2>
-    <table class="faction-table">
+    <table class="faction-table tables">
         <tr class="title-row">
             <td>Faction</td>
             <td>Last Updated</td>
         </tr>
         {% for faction in data[0] %}
         <tr class="content-row">
-            <td><a href='/faction/{{ faction["id"] }}'>{{ faction["name"] }}</a></td>
+            <td><a href="{{ url_for('faction', fac_id=faction['id']) }}">{{ faction["name"] }}</a></td>
             <td>{{ faction["updated"] }}</td>
         </tr>
         {% endfor %}
     </table>
     <h2>Secondary Factions</h2>
-    <table class="faction-table">
+    <table class="faction-table tables">
         <tr class="title-row">
             <td>Faction</td>
             <td>Last Updated</td>
         </tr>
         {% for faction in data[1] %}
         <tr class="content-row">
-            <td><a href='/faction/{{ faction["id"] }}'>{{ faction["name"] }}</a></td>
+            <td><a href="{{ url_for('faction', fac_id=faction['id']) }}">{{ faction["name"] }}</a></td>
             <td>{{ faction["updated"] }}</td>
         </tr>
         {% endfor %}

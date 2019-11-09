@@ -7,8 +7,11 @@ import threading
 from .listener import receiver
 from .listener import parser
 import time
+from datetime import datetime
 
-log.start('tracker')
+filename = 'tracker-%s' % datetime.strftime(datetime.now(), '%Y-%m-%d-%H-%M-%S')
+
+log.start(filename)
 conn = database.connect()
 shutdown = threading.Event()
 
