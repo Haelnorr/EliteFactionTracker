@@ -9,7 +9,8 @@ Restart=always
 RestartSec=1
 User=user
 WorkingDirectory=/home/user/edft
-ExecStart=/usr/bin/python3 -m EliteFactionTracker.run
+Environment="PATH=/home/user/edft/venv/bin"
+ExecStart=/home/user/edft/venv/bin/python3 -m EliteFactionTracker.run
 
 [Install]
 WantedBy=multi-user.target
