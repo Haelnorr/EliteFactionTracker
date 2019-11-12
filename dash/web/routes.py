@@ -26,7 +26,7 @@ def dash_redirect():
 
 @dash_app.route('/')
 def dashboard():
-    alert_data = datafetch.get_alerts()
+    alert_data = datafetch.get_alerts(current_user.is_anonymous)
     alert_list = alert_data[0]
     alert_count = (alert_data[1], len(alert_list))
     factions = datafetch.get_tracked_factions()

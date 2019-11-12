@@ -13,11 +13,9 @@
             <h5><a href="{{ url_for('faction', fac_id=faction['id']) }}">{{ faction["name"] }}</a></h5>
                 {% for alert in faction["alerts"] %}
                 <div>
-                    {% if alert[1] != "info" or current_user.is_anonymous == False %}
                     <div class="alert-{{ alert[1] }}">
                         {{ alert[0] }}
                     </div>
-                    {% endif %}
                 </div>
                 {% endfor %}
         </div>
@@ -59,7 +57,7 @@
                              -- Expires: {{ notice.expiry|date }}
                             {% endif %}
                         </span>
-                        <span class="notice-timestamp">Posted on: {{ notice.timestamp|datetime }}</span>
+                        <span class="notice-timestamp">Posted by <b>{{ notice.author.username }}</b> on <b>{{ notice.timestamp|datetime }}</b></span>
                     </div>
                     <div class="notice-message">{{ notice.message }}</div>
                 </div>

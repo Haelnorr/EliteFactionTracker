@@ -8,7 +8,7 @@ from .. import classes
 __conn = database.connect()
 
 
-def get_alerts():
+def get_alerts(anonymous):
     """
     Generate alerts from the database
     :return: list of alerts
@@ -71,7 +71,7 @@ def get_alerts():
             alert = '{stage} expansion detected on {detected}'
             alert = alert.format(stage=expansion.stage, detected=date_detected)
             alert_entry['alerts'].append((alert, 'bonus'))
-            if expansion.system_id is None:
+            if expansion.system_id is None and anonymous is False:
                 alert = 'Expansion is not being tracked (WIP)'
                 alert_entry['alerts'].append((alert, 'info'))
         except TypeError:
