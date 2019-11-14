@@ -165,10 +165,10 @@ def __parse_data(system_db, message):
                     database.delete_conflict(db_conn, conflict.conflict_id)
 
         # update factions and presences
-        expansion = False
-        retreat = False
         current_list = []
         for faction in factions:
+            expansion = False
+            retreat = False
             if faction[1] is not False:  # 'not tracked' flag was not set
                 current_list.append(faction[1].faction_id)
                 # check states
