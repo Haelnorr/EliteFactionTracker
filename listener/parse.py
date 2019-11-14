@@ -313,7 +313,7 @@ def __parse_data(system_db, message):
                 if expansion is False:
                     try:
                         expansion_db = database.fetch_expansion(db_conn, faction[1].faction_id)
-                        database.delete_expansion(expansion_db.faction_id)
+                        database.delete_expansion(db_conn, expansion_db.faction_id)
                     except TypeError:
                         pass
 
