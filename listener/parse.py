@@ -153,6 +153,12 @@ def __parse_data(system_db, message):
                             timestamp
                         )
                         database.new_conflict(db_conn, conflict_entry)
+                        try:
+                            conflict_db = database.fetch_conflict(db_conn, sys_id=system_db.system_id,
+                                                                  fac_name=conflict['Faction1']['Name'])
+                            current_list.append(conflict_db.conflict_id)
+                        except TypeError:
+                            pass
                         log.info('New conflict found')
         except KeyError:
             log.debug('No conflict found in %s' % system_db.name)
