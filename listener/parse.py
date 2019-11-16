@@ -79,7 +79,7 @@ def __parse_data(system_db, message):
                 if totaldays_message > totaldays_db:
                     cached = False
             except TypeError:
-                pass
+                cached = False
     except KeyError:
         pass
 
