@@ -76,6 +76,18 @@ def get_alerts(anonymous):
                 alert_entry['alerts'].append((alert, 'info'))
         except TypeError:
             pass
+        conflicts = database.fetch_conflict(__conn, fac_name=faction.name)
+        for conflict in conflicts:
+            opponent = conflict.faction_name_1
+            score1, score2 = conflict.faction_score_2, conflict.faction_score_1
+            if faction.name in opponent:
+                opponent = conflict.faction_name_2
+                score1, score2 = score2, score1
+            system = database.fetch_system(__conn, conflict.system_id)
+            alert = '{stage} conflict against {opponent} in {system}. Score: {score1} - {score2}'
+            alert = alert.format(stage=conflict.stage.capitalize(), opponent=opponent, system=system.name,
+                                 score1=score1, score2=score2)
+            alert_entry['alerts'].append((alert, 'info'))
         if len(alert_entry['alerts']) > 0:
             alert_entry['alerts'] = sorted(alert_entry['alerts'], key=lambda s: s[1])
             alerts.append(alert_entry)
@@ -153,7 +165,8 @@ def get_system(system):
 
     for conflict in conflicts:
         conflict.updated_at = time_since(conflict.updated_at)
-        conflict.date_started = datetime.strftime(datetime.strptime(conflict.date_started, database.DATETIME_FMT), '%d/%b/%y')
+        conflict.date_started = datetime.strftime(datetime.strptime(conflict.date_started, database.DATETIME_FMT),
+                                                  '%d/%b/%y')
         if conflict.faction_stake_1 == '':
             conflict.faction_stake_1 = 'None'
         if conflict.faction_stake_2 == '':
@@ -277,7 +290,6 @@ def get_tracked_factions():
         systems = len(database.fetch_presence(__conn, fac_id=faction.faction_id))
         sql = 'SELECT system_id FROM System WHERE controlling_faction=?'
         controlling = len(database.query(__conn, sql, (faction.name,)))
-        conflicts = len(bin(faction.conflict_flags).strip('0b'))
         expansion = 'Not active'
         try:
             expansion = database.fetch_expansion(__conn, faction.faction_id)
@@ -289,7 +301,7 @@ def get_tracked_factions():
             'name': faction.name,
             'systems': systems,
             'controlling': controlling,
-            'conflicts': conflicts,
+            'conflicts': faction.conflict_flags,
             'expansion': expansion
         }
         result.append(data)

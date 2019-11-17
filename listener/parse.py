@@ -333,9 +333,7 @@ def __parse_data(system_db, message):
 
                 # update faction
                 conflict_db = database.fetch_conflict(db_conn, fac_name=faction[1].name)
-                conflict_flags = 0
-                for conflict in conflict_db:
-                    conflict_flags += 2 ** conflict.conflict_id
+                conflict_flags = len(conflict_db)
                 expansion = 0
                 try:
                     database.fetch_expansion(db_conn, faction[1].faction_id)
