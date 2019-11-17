@@ -87,7 +87,7 @@ def get_alerts(anonymous):
             alert = '{stage} conflict against {opponent} in {system}. Score: {score1} - {score2}'
             alert = alert.format(stage=conflict.stage.capitalize(), opponent=opponent, system=system.name,
                                  score1=score1, score2=score2)
-            alert_entry['alerts'].append((alert, 'info'))
+            alert_entry['alerts'].append((alert, 'conflict'))
         if len(alert_entry['alerts']) > 0:
             alert_entry['alerts'] = sorted(alert_entry['alerts'], key=lambda s: s[1])
             alerts.append(alert_entry)

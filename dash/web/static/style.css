@@ -1,7 +1,7 @@
 html, body {
     min-height: 100vh;
     height: 100vh;
-    min-width: 1060px;
+    min-width: 1160px;
 }
 
 body {
@@ -231,7 +231,7 @@ footer {
     margin-bottom: 5px;
 }
 
-.alert-warning, .alert-info, .alert-bonus {
+.alert-warning, .alert-info, .alert-conflict, .alert-bonus {
     height: auto;
     border-radius: 3px;
     vertical-align: middle;
@@ -247,6 +247,11 @@ footer {
 .alert-info {
     background-color: #eb9c00;
     border: 2px solid #966400;
+}
+
+.alert-conflict {
+    background-color: #d14706;
+    border: 2px solid #8a2c00;
 }
 
 .alert-bonus {
