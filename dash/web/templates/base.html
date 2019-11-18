@@ -6,9 +6,64 @@
     {% if icon %}
     <link rel="shortcut icon" href="{{ url_for('static', filename='icon.ico') }}">
     {% endif %}
+    {% if request.MOBILE %}
+    <!--  MOBILE CSS  -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style-mobile.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    {% else %}
+    <!--  DESKTOP CSS  -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% endif %}
 </head>
 <body>
+{% if request.MOBILE %}
+    <!--  MOBILE CONTENT  -->
+    <div id="page-content-mb">
+        <div class="title-mb">
+            <a href="{{ url_for('dashboard') }}" class="active">ED Faction Tracker</a>
+            <div id="nav-mb">
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('system') }}">Systems</a>
+                <a href="{{ url_for('faction') }}">Factions</a>
+                <a href="{{ url_for('notices') }}">Notices</a>
+                {% if current_user.is_anonymous %}
+                <a href="{{ url_for('login') }}">Manage</a>
+                {% else %}
+                <a href="{{ url_for('manage') }}">Manage</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+                {% endif %}
+            </div>
+            <a href="javascript:void(0);" class="icon" onclick="showNav()">
+                <i class="fa fa-bars"></i>
+            </a>
+        </div>
+        <script>
+            function showNav() {
+                var x = document.getElementById("nav-mb");
+                if (x.style.display === "block") {
+                    x.style.display = "none";
+                } else {
+                    x.style.display = "block";
+                }
+            }
+        </script>
+        {% block mobile_content %}{% endblock %}
+    </div>
+    <footer>
+        <div id="footer-pad-mb"></div>
+        <div id="footer-content-mb">
+            Elite: Dangerous Faction Tracker (EliteFactionTracker) - Version {{ version }} - © Haelnorr 2019<br>
+            <a href="https://github.com/Haelnorr/EliteFactionTracker">GitHub</a> |
+            <a href="https://github.com/Haelnorr/EliteFactionTracker/issues/new">Report a Bug</a> |
+            <a href="{{ url_for('about') }}">About</a>
+            <br><br>
+            <a href="https://www.elitedangerous.com/">Elite: Dangerous</a> © 2012, 2013 Frontier Developments plc. All rights reserved.<br>
+            This is not an official tool for the game Elite: Dangerous and is not affiliated with Frontier Developments.
+
+        </div>
+    </footer>
+{% else %}
+    <!--  DESKTOP CONTENT  -->
     <div id="page-content">
         <div id="title">
             <div id="title-left">
@@ -63,5 +118,6 @@
 
         </div>
     </footer>
+{% endif %}
 </body>
 </html>
