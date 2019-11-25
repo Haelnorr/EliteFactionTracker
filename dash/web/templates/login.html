@@ -1,5 +1,30 @@
 {% extends "base.html" %}
-
+{% if request.MOBILE %}
+{% block mobile_content %}
+<div id="content-mb">
+    <form id="login-mb" class="forms" action="" method="post" novalidate>
+        <h3>Manager Login</h3>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.username.label }}<br>
+            {{ form.username(class='textfield-mb') }}<br>
+            {% for error in form.username.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.password.label }}<br>
+            {{ form.password(class='textfield-mb') }}<br>
+            {% for error in form.password.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.remember_me(class='checkbox-mb') }} {{ form.remember_me.label }}</p>
+        <p>{{ form.submit() }}</p>
+    </form>
+</div>
+{% endblock %}
+{% else %}
 {% block content %}
     <form id="login" class="forms" action="" method="post" novalidate>
         <h3>Manager Login</h3>
@@ -22,3 +47,4 @@
         <p>{{ form.submit() }}</p>
     </form>
 {% endblock %}
+{% endif %}

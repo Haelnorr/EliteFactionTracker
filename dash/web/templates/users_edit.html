@@ -1,5 +1,42 @@
 {% extends "manage.html" %}
+{% if request.MOBILE %}
+{% block mobile_manage %}
+    <form id="user-edit-mb" class="forms" action="" method="post" novalidate>
+        <h3>Edit User</h3>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ user.username }}
+        </p>
+        <p>
+            {{ form.permission.label }}:
+            {{ form.permission(class="selectfield-mb") }}<br>
+        </p>
+        <p>
+            {{ form.reset_pass.label }}: {{ form.reset_pass(onchange="enablePass()", class="checkbox-mb") }}<br>
+            To reset pass, type a new password below
+            and provide this to the user. They will
+            be forced to reset their password on login
+        </p>
+        <p>
+            {{ form.new_pass.label }}:<br>
+            {{ form.new_pass(class="textfield-mb") }}<br>
+        </p>
+        <p>{{ form.submit() }}  <a href="{{ url_for('users') }}" id="cancel-mb">Cancel</a></p>
+        <script>
+            function enablePass(){
+              var checked = document.getElementById('reset_pass').checked
+              if (checked){
+                document.getElementById('new_pass').disabled = false
+              } else {
+                document.getElementById('new_pass').disabled = true
+              }
+            }
+            enablePass()
+        </script>
 
+    </form>
+{% endblock %}
+{% else %}
 {% block manage %}
     <form id="user-edit" class="forms" action="" method="post" novalidate>
         <h3>Edit User</h3>
@@ -36,3 +73,4 @@
 
     </form>
 {% endblock %}
+{% endif %}

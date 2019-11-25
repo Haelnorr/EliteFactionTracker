@@ -1,5 +1,47 @@
 {% extends "manage.html" %}
+{% if request.MOBILE %}
+{% block mobile_manage %}
+    <form id="notice-new-mb" class="forms" action="" method="post" novalidate>
+        <h3>New Notice</h3>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.post_title.label }}<br>
+            {{ form.post_title(class='textfield-mb') }}<br>
+            {% for error in form.post_title.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.priority.label }}: {{ form.priority(class="selectfield-mb") }}
+            <br>
+            <br>
+            {{ form.expiry_enable.label }} {{ form.expiry_enable(onclick="enableExpiry()", class="checkbox-mb") }}
+            <br>
+            {{ form.expiry.label }}: {{ form.expiry(class="selectfield-mb") }}
+        </p>
+        <p>
+            {{ form.message.label }}<br>
+            {{ form.message() }}<br>
+            {% for error in form.message.errors %}
+            <span style="color: red;">[{{ error }}]</span><br>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}  <a href="{{ url_for('manage_notices') }}" id="cancel-mb">Cancel</a></p>
+        <script>
+            function enableExpiry(){
+              var checked = document.getElementById('expiry_enable').checked
+              if (checked){
+                document.getElementById('expiry').disabled = false
+              } else {
+                document.getElementById('expiry').disabled = true
+              }
+            }
+            enableExpiry()
+        </script>
 
+    </form>
+{% endblock %}
+{% else %}
 {% block manage %}
     <form id="notice-new" class="forms" action="" method="post" novalidate>
         <h3>New Notice</h3>
@@ -36,3 +78,4 @@
 
     </form>
 {% endblock %}
+{% endif %}

@@ -1,5 +1,93 @@
 {% extends "base.html" %}
-
+{% if request.MOBILE %}
+{% block mobile_content %}
+<div id="content-mb">
+    {% if faction == True %}
+    <h2>{{ data[0] }}</h2>
+    <table class="faction-table tables table-scroll">
+        <tr class="title-row">
+            <td>System</td>
+            <td>Influence</td>
+            <td>States</td>
+            <td>Updated</td>
+        </tr>
+        {% for system in data[1] %}
+        <tr class="content-row">
+            <td><a href="{{ url_for('system', sys_id=system['id']) }}">{{ system["name"] }}</a></td>
+            <td>{{ system["influence"] }}</td>
+            <td>
+                {% if system["states"]|length == 0 %}
+                    None
+                {% else %}
+                    {% for state in system["states"] %}
+                        {{ state }}
+                    {% endfor %}
+                {% endif %}
+            </td>
+            <td>{{ system["updated"] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <h2>Conflicts</h2>
+    {% if data[2]|length == 0 %}
+    <p>There are no conflicts to show</p>
+    {% else %}
+    <table class="conflict-table tables table-scroll">
+        <tr class="title-row">
+            <td>System</td>
+            <td>Stake at Risk</td>
+            <td>Score</td>
+            <td>Opponent</td>
+            <td>Stake to Win</td>
+            <td>Stage</td>
+            <td>Started</td>
+            <td>Updated</td>
+        </tr>
+        {% for conflict in data[2] %}
+        <tr class="content-row">
+            <td><a href="{{ url_for('system', sys_id=conflict['system_id']) }}">{{ conflict["system_name"] }}</a></td>
+            <td>{{ conflict["stake_at_risk"] }}</td>
+            <td>{{ conflict["score"] }}</td>
+            <td><a href="{{ url_for('faction', fac_id=conflict['opponent_id']) }}">{{ conflict["opponent"] }}</a></td>
+            <td>{{ conflict["stake_to_win"] }}</td>
+            <td>{{ conflict["stage"] }}</td>
+            <td>{{ conflict["date_started"] }}</td>
+            <td>{{ conflict["updated_at"] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+    {% else %}
+    <h2>Tracked Factions</h2>
+    <table class="faction-table tables">
+        <tr class="title-row">
+            <td>Faction</td>
+            <td>Updated</td>
+        </tr>
+        {% for faction in data[0] %}
+        <tr class="content-row">
+            <td><a href="{{ url_for('faction', fac_id=faction['id']) }}">{{ faction["name"] }}</a></td>
+            <td>{{ faction["updated"] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <h2>Secondary Factions</h2>
+    <table class="faction-table tables">
+        <tr class="title-row">
+            <td>Faction</td>
+            <td>Last Updated</td>
+        </tr>
+        {% for faction in data[1] %}
+        <tr class="content-row">
+            <td><a href="{{ url_for('faction', fac_id=faction['id']) }}">{{ faction["name"] }}</a></td>
+            <td>{{ faction["updated"] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+</div>
+{% endblock %}
+{% else %}
 {% block content %}
 <div id="content">
     {% if faction == True %}
@@ -87,3 +175,4 @@
     {% endif %}
 </div>
 {% endblock %}
+{% endif %}

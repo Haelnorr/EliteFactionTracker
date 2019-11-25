@@ -260,16 +260,16 @@ footer {
 }
 
 .forms {
-  background-color: rgb(49, 49, 49);
-  background-color: rgba(49, 49, 49, 0.7);
-  width: 300px;
-  text-align: center;
-  padding: 10px;
-  border-radius: 5px;
-  border: 3px solid #131313;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 30px;
+    background-color: rgb(49, 49, 49);
+    background-color: rgba(49, 49, 49, 0.7);
+    width: 300px;
+    text-align: center;
+    padding: 10px;
+    border-radius: 5px;
+    border: 3px solid #131313;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px;
 }
 
 .forms input[type=submit] {
