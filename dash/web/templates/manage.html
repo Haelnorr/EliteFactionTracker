@@ -1,5 +1,19 @@
 {% extends "base.html" %}
-
+{% if request.MOBILE %}
+{% block mobile_content %}
+<div id="content-mb">
+<div id="manage-dash-mb">
+    <h2>Manager Dashboard</h2>
+    <div id="manage-nav-mb">
+        <a href="{{ url_for('manage_notices') }}">Notices</a>
+        <a>Expansions</a>
+        <a href="{{ url_for('users') }}">Users</a>
+    </div>
+    {% block mobile_manage %}{% endblock %}
+</div>
+</div>
+{% endblock %}
+{% else %}
 {% block content %}
 <div id="manage-dash">
     <h2>Manager Dashboard</h2>
@@ -12,3 +26,4 @@
     {% block manage %}{% endblock %}
 </div>
 {% endblock %}
+{% endif %}

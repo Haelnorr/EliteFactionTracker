@@ -1,5 +1,34 @@
 {% extends "manage.html" %}
+{% if request.MOBILE %}
+{% block mobile_manage %}
+    <form id="user-new-mb" class="forms" action="" method="post" novalidate>
+        <h3>New User</h3>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.username.label }}<br>
+            {{ form.username(class="textfield-mb") }}<br>
+            {% for error in form.username.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.permission.label }}<br>
+            {{ form.permission(class="selectfield-mb") }}<br>
+        </p>
+        <p>
+            {{ form.password.label }}<br>
+            {{ form.password(class="textfield-mb") }}<br>
+            {% for error in form.password.errors %}
+            <span style="color: red;">[{{ error }}]</span><br>
+            {% endfor %}
+            Give this password to the user<br>
+            They will be forced to change it on login
+        </p>
+        <p>{{ form.submit() }}  <a href="{{ url_for('users') }}" id="cancel-mb">Cancel</a></p>
 
+    </form>
+{% endblock %}
+{% else %}
 {% block manage %}
     <form id="user-new" class="forms" action="" method="post" novalidate>
         <h3>New User</h3>
@@ -28,3 +57,4 @@
 
     </form>
 {% endblock %}
+{% endif %}

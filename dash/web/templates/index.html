@@ -1,4 +1,78 @@
 {% extends "base.html" %}
+{% if request.MOBILE %}
+{% block mobile_content %}
+<div id="content-mb">
+    <h2>Dashboard</h2>
+    <div id="faction-tiles-mb">
+            <h4>Tracked Factions</h4>
+            {% for faction in factions %}
+            <div class="faction-tile">
+                <a href="{{ url_for('faction', fac_id=faction['id']) }}">{{ faction["name"] }}</a>
+                <span>Systems: {{ faction["systems"] }}</span>
+                <span>Controlling: {{ faction["controlling"] }}</span>
+                <span>Conflicts: {{ faction["conflicts"] }}</span>
+                <span>Expansion: {{ faction["expansion"] }}</span>
+            </div>
+        {% endfor %}
+        </div>
+    <br>
+    <br>
+    <hr>
+    <hr>
+    <br>
+    <h4>Alerts</h4>
+        {% if alert_count[0] == 0 %}
+        <h5>There are no alerts</h5>
+        {% else %}
+        <p>There are {{ alert_count[0] }} alerts for {{ alert_count[1] }} factions</p>
+        {% for faction in alerts %}
+        <div class="alert-block">
+            <h5><a href="{{ url_for('faction', fac_id=faction['id']) }}">{{ faction["name"] }}</a></h5>
+                {% for alert in faction["alerts"] %}
+                <div>
+                    <div class="alert-{{ alert[1] }}">
+                        {{ alert[0] }}
+                    </div>
+                </div>
+                {% endfor %}
+        </div>
+        {% endfor %}
+        {% endif %}
+    <br>
+    <br>
+    <hr>
+    <hr>
+    <br>
+        <div id="notices-mb">
+            <h4>High Priority Notices</h4>
+            <a href="{{ url_for('notices') }}">View all notices</a><br><br>
+            {% for notice in notices %}
+                <div class="notice">
+                    <div class="notice-title-bar">
+                        <span class="notice-title">{{ notice.title }}</span><br>
+                        <span>Priority:
+                            <span class="priority-{{ notice.priority }}">
+                                {% if notice.priority == 1 %}
+                                High
+                                {% elif notice.priority == 2 %}
+                                Medium
+                                {% else %}
+                                Low
+                                {% endif %}
+                            </span>
+                            {% if not notice.expiry == None %}
+                             <br>Expires: {{ notice.expiry|date }}
+                            {% endif %}
+                        </span><br>
+                        <span class="notice-timestamp">Posted by <b>{{ notice.author.username }}</b> on <b>{{ notice.timestamp|datetime }}</b></span>
+                    </div>
+                    <div class="notice-message">{{ notice.message }}</div>
+                </div>
+            {% endfor %}
+        </div>
+</div>
+{% endblock %}
+{% else %}
 {% block content %}
 <div id="index">
     <h2>Dashboard</h2>
@@ -66,3 +140,4 @@
     </div>
 </div>
 {% endblock %}
+{% endif %}

@@ -1,8 +1,16 @@
 {% extends "base.html" %}
-
+{% if request.MOBILE %}
+{% block mobile_content %}
+<div id="content-mb">
+    <h1>File Not Found</h1>
+    <p><a href="{{ url_for('dashboard') }}">Dashboard</a></p>
+</div>
+{% endblock %}
+{% else %}
 {% block content %}
 <div id="content">
     <h1>File Not Found</h1>
     <p><a href="{{ url_for('dashboard') }}">Dashboard</a></p>
 </div>
 {% endblock %}
+{% endif %}

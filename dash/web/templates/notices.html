@@ -1,5 +1,37 @@
 {% extends "base.html" %}
-
+{% if request.MOBILE %}
+{% block mobile_content %}
+<div id="content-mb">
+    <h2>Notices</h2>
+    {% if current_user.is_anonymous == False %}
+    <a href="{{ url_for('manage_notices') }}">Manage Notices</a>
+    {% endif %}
+    {% for notice in notices %}
+        <div class="notice">
+            <div class="notice-title-bar">
+                <span class="notice-title">{{ notice.title }}</span><br>
+                <span>Priority:
+                    <span class="priority-{{ notice.priority }}">
+                        {% if notice.priority == 1 %}
+                        High
+                        {% elif notice.priority == 2 %}
+                        Medium
+                        {% else %}
+                        Low
+                        {% endif %}
+                    </span>
+                    {% if not notice.expiry == None %}
+                    <br>Expires: {{ notice.expiry|date }}
+                    {% endif %}
+                </span>
+                <span class="notice-timestamp">Posted on: {{ notice.timestamp|datetime }}</span>
+            </div>
+            <div class="notice-message">{{ notice.message }}</div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
+{% else %}
 {% block content %}
 <div id="content">
     <h2>Notices</h2>
@@ -31,3 +63,4 @@
     {% endfor %}
 </div>
 {% endblock %}
+{% endif %}
