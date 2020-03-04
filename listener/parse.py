@@ -56,7 +56,7 @@ def __parse_data(system_db, message):
 
                 # work on method of debouncing more accurately
 
-                if faction_db.master is 0:
+                if faction_db.master == 0:
                     master = faction_db.faction_id
 
                 # group old and new data together and add to list
@@ -66,6 +66,7 @@ def __parse_data(system_db, message):
 
                 # add to list with 'False' flag to indicate its not tracked
                 factions.append((faction, False))
+                cached = False
 
     # debounce conflicts if influences are static
     try:
