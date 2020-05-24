@@ -38,7 +38,11 @@ def __parse_data(system_db, message):
     # system is tracked in the database
     cached = True
     factions = []
-    master = 0
+
+    master = database.query(db_conn, 'SELECT faction_id FROM Faction WHERE master=0')[0][0]
+    # this line is a dirty, unclean way of selecting the faction ID of the faction set as the master faction. It
+    # queries which faction is set as master and returns its faction ID before extracting it from the array and list
+    # that the function returns
 
     # debounce influence data
     for faction in message['Factions']:
@@ -55,9 +59,6 @@ def __parse_data(system_db, message):
                     cached = False
 
                 # work on method of debouncing more accurately
-
-                if faction_db.master == 0:
-                    master = faction_db.faction_id
 
                 # group old and new data together and add to list
                 factions.append((faction, faction_db, presence_db))
