@@ -439,3 +439,16 @@ footer {
 .priority-3 {
     color: #02a63e;
 }
+
+.systempreviewlist {
+    list-style-type:none;
+    text-align: left;
+}
+
+.systempreviewlist li {
+    padding-bottom: 10px;
+}
+
+#newsystemconfirm, #newsystemconfirm-mb {
+    width: 500px;
+}

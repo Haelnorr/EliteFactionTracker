@@ -1,3 +1,5 @@
+from urllib import parse
+
 from flask import render_template, redirect, flash, url_for, request
 from . import dash_app, db, forms
 from ...definitions import VERSION, ROOT_DIR
@@ -8,6 +10,7 @@ from werkzeug.urls import url_parse
 from datetime import time, datetime
 from sqlalchemy import or_
 import os.path
+from ... import bgsapi
 
 icon = os.path.isfile(os.path.join(ROOT_DIR, 'dash', 'web', 'static', 'icon.ico'))
 watermark = os.path.isfile(os.path.join(ROOT_DIR, 'dash', 'web', 'static', 'watermark.svg'))
@@ -275,6 +278,33 @@ def delete_notice(notice_id=None):
         else:
             flash('Check the box to confirm deletion')
     return render_template('notices_delete.html', page='Delete Notice', form=form, notice=notice)
+
+
+@dash_app.route('/manage/newsystem', methods=['GET', 'POST'])
+@login_required
+def manage_newsystem():
+    if current_user.reset_pass is True:
+        return redirect(url_for('reset_pass'))
+    form = forms.NewSystem()
+    if form.validate_on_submit():
+        system_name = form.systemname.data
+        return redirect(url_for('manage_confirmnewsystem', system_name=system_name))
+    return render_template('newsystem.html', page='Track New System', form=form)
+
+
+@dash_app.route('/manage/newsystem/preview')
+@dash_app.route('/manage/newsystem/preview/')
+@dash_app.route('/manage/newsystem/preview/<system_name>', methods=['GET', 'POST'])
+@login_required
+def manage_confirmnewsystem(system_name=None):
+    form = forms.ConfirmNewSystem()
+    systemdata = bgsapi.system_request(system_name)
+    if system_name is None:
+        return redirect(url_for('manage_newsystem'))
+    if form.validate_on_submit():
+        bgsapi.track_system(system_name)
+        return redirect(url_for('system', sys_id=systemdata['id']))
+    return render_template('newsystemconfirm.html', page='Track New System', form=form, systemdata=systemdata)
 
 
 @dash_app.route('/notices')

@@ -1,0 +1,40 @@
+{% extends "manage.html" %}
+{% if request.MOBILE %}
+{% block mobile_manage %}
+    <form id="newsystemconfirm-mb" class="forms" action="" method="post" novalidate>
+        <h3>Track New System</h3>
+        {{ form.hidden_tag() }}
+        <ul class="systempreviewlist">
+            <li><b>System ID:</b> {{ systemdata["id"] }}</li>
+            <li><b>Name:</b> {{ systemdata["name"] }}</li>
+            <li><b>Controlling Faction:</b> {{ systemdata["controlling_faction"] }}</li>
+            <li><b>Co-ordinates:</b> {{ systemdata["x"] }}, {{ systemdata["y"] }}, {{ systemdata["z"] }}</li>
+            <li><b>Population:</b> {{ systemdata["population"] }}</li>
+            <li><b>Updated At:</b> {{ systemdata["updated_at"] }}</li>
+            <li><b>Conflicts:</b> {{ systemdata["conflicts"]|length }}</li>
+            <li><b>Factions:</b> {{ systemdata["factions"]|length }}</li>
+        </ul>
+        <p>{{ form.submit() }}  <a href="{{ url_for('manage') }}" id="cancel-mb">Cancel</a></p>
+
+    </form>
+{% endblock %}
+{% else %}
+{% block manage %}
+    <form id="newsystemconfirm" class="forms" action="" method="post" novalidate>
+        <h3>Track New System</h3>
+        {{ form.hidden_tag() }}
+        <ul class="systempreviewlist">
+            <li><b>System ID:</b> {{ systemdata["id"] }}</li>
+            <li><b>Name:</b> {{ systemdata["name"] }}</li>
+            <li><b>Controlling Faction:</b> {{ systemdata["controlling_faction"] }}</li>
+            <li><b>Co-ordinates:</b> {{ systemdata["x"] }}, {{ systemdata["y"] }}, {{ systemdata["z"] }}</li>
+            <li><b>Population:</b> {{ systemdata["population"] }}</li>
+            <li><b>Updated At:</b> {{ systemdata["updated_at"] }}</li>
+            <li><b>Conflicts:</b> {{ systemdata["conflicts"]|length }}</li>
+            <li><b>Factions:</b> {{ systemdata["factions"]|length }}</li>
+        </ul>
+        <p>{{ form.submit() }}  <a href="{{ url_for('manage') }}" id="cancel">Cancel</a></p>
+
+    </form>
+{% endblock %}
+{% endif %}

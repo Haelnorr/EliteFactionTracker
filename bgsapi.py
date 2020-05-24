@@ -7,7 +7,7 @@ from . import log
 __API_DATE_FMT = '%Y-%m-%dT%H:%M:%S.000Z'
 
 
-def __system(name):
+def system_request(name):
     # requests data from the API on the system specified
     log.info('API system data requested: ' + name)
     query = '?name=' + parse.quote(name, safe='')
@@ -114,7 +114,7 @@ def new_faction(faction_name):
 
     # get data on relevant systems
     for system in _faction['presence']:
-        _system = __system(system['system_name'])   # return data from system lookup
+        _system = system_request(system['system_name'])   # return data from system lookup
 
         # add secondary factions to list
         for __faction in _system['factions']:
@@ -259,7 +259,7 @@ def new_faction(faction_name):
 
 def track_system(system_name):
     __conn = database.connect()
-    system = __system(system_name)  # return data from system lookup
+    system = system_request(system_name)  # return data from system lookup
     # convert update time to database friendly format
     timestamp = datetime.strftime(datetime.strptime(system['updated_at'], __API_DATE_FMT), database.DATETIME_FMT)
 
@@ -281,7 +281,3 @@ def track_system(system_name):
     except database.sqlite3.IntegrityError:
         log.info('System already in database: ' + system['name'])
     __conn.close()
-
-
-def track_expansion(origin_id):
-    return
