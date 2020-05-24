@@ -197,8 +197,10 @@ def fetch_system(conn, system):
         cur.execute("SELECT * FROM System WHERE system_id=?", (system,))
     except ValueError:
         cur.execute("SELECT * FROM System WHERE name=?", (system,))
-
-    s = classes.System(cur.fetchone())
+    try:
+        s = classes.System(cur.fetchone())
+    except TypeError:
+        return None
 
     return s
 

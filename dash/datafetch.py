@@ -38,8 +38,8 @@ def get_alerts(anonymous):
                 pass
             # check if there was a large influence swing
             inf_difference = round((presence.influence[0] - presence.influence[1]) * 100, 1)
-            if abs(inf_difference) > 3:
-                alert = 'Influence swung by {swing} in {system}'
+            if abs(inf_difference) > 2:
+                alert = 'Influence swung by {swing}% in {system}'
                 alert = alert.format(swing=inf_difference, system=system.name)
                 level = 'bonus'
                 if inf_difference < 0:

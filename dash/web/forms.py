@@ -3,6 +3,7 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField, Selec
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired, EqualTo, ValidationError
 from .models import User
+from ... import database
 
 
 class LoginForm(FlaskForm):
@@ -89,3 +90,19 @@ class DeleteNotice(FlaskForm):
     def validate_confirm(self, confirm):
         if self.confirm.data is False:
             raise ValidationError('Check the box to confirm deletion.')
+
+
+class NewSystem(FlaskForm):
+    systemname = StringField('System Name', validators=[DataRequired()])
+    submit = SubmitField('Track System')
+
+    def validate_systemname(self, systemname):
+        conn = database.connect()
+        system = database.fetch_system(conn, systemname.data)
+        if system is not None:
+            raise ValidationError('System is already in the database.')
+
+
+class ConfirmNewSystem(FlaskForm):
+    submit = SubmitField('Confirm')
+
