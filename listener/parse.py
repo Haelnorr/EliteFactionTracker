@@ -26,7 +26,7 @@ def parser(pipeline, shutdown):
                 log.info('System match found: %s; parsing data' % system_db.name)
                 __parse_data(system_db, message)
 
-            except TypeError:
+            except (TypeError, AttributeError):
                 log.debug('System match not found: %s; moving onto next message' % system_name)
 
     log.info('Shutting down Parser')
