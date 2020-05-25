@@ -117,7 +117,7 @@ def get_system(system):
         try:
             home_system_db = database.fetch_system(__conn, home_system['id'])
             home_system['name'] = home_system_db.name
-        except TypeError:
+        except (TypeError, AttributeError):
             home_system['name'] = None
 
         expansion = None
