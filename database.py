@@ -184,7 +184,7 @@ def new_system(conn, data):
     conn.commit()
 
 
-def fetch_system(conn, system):
+def fetch_system(conn, system=None):
     """
     Fetches data from the database on the specified system
     :param conn: the database connection object
@@ -192,15 +192,21 @@ def fetch_system(conn, system):
     :return: 'System' object
     """
     cur = conn.cursor()
-    try:
-        int(system)
-        cur.execute("SELECT * FROM System WHERE system_id=?", (system,))
-    except ValueError:
-        cur.execute("SELECT * FROM System WHERE name=?", (system,))
-    try:
-        s = classes.System(cur.fetchone())
-    except TypeError:
-        return None
+    s = []
+    if system is not None:
+        try:
+            int(system)
+            cur.execute("SELECT * FROM System WHERE system_id=?", (system,))
+        except ValueError:
+            cur.execute("SELECT * FROM System WHERE name=?", (system,))
+        try:
+            s = classes.System(cur.fetchone())
+        except TypeError:
+            return None
+    else:
+        cur.execute('SELECT * FROM System')
+        for system in cur.fetchall():
+            s.append(classes.System(system))
 
     return s
 
@@ -360,18 +366,28 @@ def new_expansion(conn, data):
     conn.commit()
 
 
-def fetch_expansion(conn, fac_id=None):
+def fetch_expansion(conn, fac_id=None, sys_id=None):
     """
     Fetches data on expansions from the database
     :param conn: the database connection object
     :param fac_id: (Optional) the ID of the faction
+    :param sys_id: (Optional) the ID of the system
     :return: list of 'Expansion' objects or single object if fac_id is specified
     """
     cur = conn.cursor()
     e = []
-    if fac_id is not None:
+    if sys_id is None and fac_id is not None:
         sql = '''SELECT * FROM Expansion WHERE faction_id=?'''
         cur.execute(sql, (fac_id,))
+        e = classes.Expansion(cur.fetchone())
+    elif sys_id is not None and fac_id is None:
+        sql = '''SELECT * FROM Expansion WHERE system_id=?'''
+        cur.execute(sql, (sys_id,))
+        for expansion in cur.fetchall():
+            e.append(classes.Expansion(expansion))
+    elif sys_id is not None and fac_id is not None:
+        sql = '''SELECT * FROM Expansion WHERE system_id=? AND faction_id=?'''
+        cur.execute(sql, (sys_id, fac_id))
         e = classes.Expansion(cur.fetchone())
     else:
         sql = '''SELECT * FROM Expansion'''

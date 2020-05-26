@@ -8,7 +8,7 @@ from .. import classes
 __conn = database.connect()
 
 
-def get_alerts(anonymous):
+def get_alerts(anonymous, order='system'):
     """
     Generate alerts from the database
     :return: list of alerts
@@ -16,86 +16,169 @@ def get_alerts(anonymous):
     alerts = []
     alert_count = 0
 
-    factions = database.fetch_faction(__conn)
-    # loop through all factions
-    for faction in factions:
-        alert_entry = {
-            'id': faction.faction_id,
-            'name': faction.name,
-            'alerts': []
-        }
-        presences = database.fetch_presence(__conn, fac_id=faction.faction_id)
-        for presence in presences:
-            system = database.fetch_system(__conn, presence.system_id)
-            # check if faction is in retreat
+    if order is 'faction':
+        factions = database.fetch_faction(__conn)
+        # loop through all factions
+        for faction in factions:
+            alert_entry = {
+                'id': faction.faction_id,
+                'name': faction.name,
+                'alerts': []
+            }
+            presences = database.fetch_presence(__conn, fac_id=faction.faction_id)
+            for presence in presences:
+                system = database.fetch_system(__conn, presence.system_id)
+                # check if faction is in retreat
+                try:
+                    retreat = database.fetch_retreat(__conn, fac_id=faction.faction_id, sys_id=system.system_id)
+                    date_detected = retreat.detected_on.split()[0]
+                    alert = '{stage} retreat in {system} detected on {detected}'
+                    alert = alert.format(stage=retreat.stage, system=system.name, detected=date_detected)
+                    alert_entry['alerts'].append((alert, 'warning'))
+                except TypeError:
+                    pass
+                # check if there was a large influence swing
+                inf_difference = round((presence.influence[0] - presence.influence[1]) * 100, 1)
+                if abs(inf_difference) > 2:
+                    alert = 'Influence swung by {swing}% in {system}'
+                    alert = alert.format(swing=inf_difference, system=system.name)
+                    level = 'bonus'
+                    if inf_difference < 0:
+                        level = 'warning'
+                    alert_entry['alerts'].append((alert, level))
+                if not presence.system_id == faction.home_system_id:
+                    # check if influence is in danger of retreat state
+                    influence = round(presence.influence[0]*100, 1)
+                    if influence < 9:
+                        # check conflicts
+                        if not faction.conflict_flags == 0:
+                            try:
+                                conflict = database.fetch_conflict(__conn, sys_id=system.system_id, fac_name=faction.name)
+                                opponent = conflict.faction_name_1
+                                if faction.name in opponent:
+                                    opponent = conflict.faction_name_2
+                                alert = 'Influence may drop below 5% if conflict against {opponent} is lost in {system}'
+                                alert = alert.format(opponent=opponent, system=system.name)
+                                alert_entry['alerts'].append((alert, 'warning'))
+                            except TypeError:
+                                pass
+                        elif influence < 5:
+                            alert = 'Influence below 5% in {system}'
+                            alert = alert.format(system=system.name)
+                            alert_entry['alerts'].append((alert, 'warning'))
             try:
-                retreat = database.fetch_retreat(__conn, fac_id=faction.faction_id, sys_id=system.system_id)
-                date_detected = retreat.detected_on.split()[0]
-                alert = '{stage} retreat in {system} detected on {detected}'
-                alert = alert.format(stage=retreat.stage, system=system.name, detected=date_detected)
-                alert_entry['alerts'].append((alert, 'warning'))
+                expansion = database.fetch_expansion(__conn, fac_id=faction.faction_id)
+                date_detected = expansion.detected_on.split()[0]
+                alert = '{stage} expansion detected on {detected}'
+                alert = alert.format(stage=expansion.stage, detected=date_detected)
+                alert_entry['alerts'].append((alert, 'bonus'))
+                if expansion.system_id is None and anonymous is False:
+                    alert = 'Expansion is not being tracked (WIP)'
+                    alert_entry['alerts'].append((alert, 'info'))
             except TypeError:
                 pass
-            # check if there was a large influence swing
-            inf_difference = round((presence.influence[0] - presence.influence[1]) * 100, 1)
-            if abs(inf_difference) > 2:
-                alert = 'Influence swung by {swing}% in {system}'
-                alert = alert.format(swing=inf_difference, system=system.name)
-                level = 'bonus'
-                if inf_difference < 0:
-                    level = 'warning'
-                alert_entry['alerts'].append((alert, level))
-            if not presence.system_id == faction.home_system_id:
-                # check if influence is in danger of retreat state
-                influence = round(presence.influence[0]*100, 1)
-                if influence < 9:
-                    # check conflicts
-                    if not faction.conflict_flags == 0:
-                        try:
-                            conflict = database.fetch_conflict(__conn, sys_id=system.system_id, fac_name=faction.name)
-                            opponent = conflict.faction_name_1
-                            if faction.name in opponent:
-                                opponent = conflict.faction_name_2
-                            alert = 'Influence may drop below 5% if conflict against {opponent} is lost in {system}'
-                            alert = alert.format(opponent=opponent, system=system.name)
+            conflicts = database.fetch_conflict(__conn, fac_name=faction.name)
+            for conflict in conflicts:
+                fac_1 = database.fetch_faction(__conn, conflict.faction_name_1)
+                fac_2 = database.fetch_faction(__conn, conflict.faction_name_2)
+                if not (fac_1.home_system_id is fac_2.home_system_id is conflict.system_id):
+                    opponent = conflict.faction_name_1
+                    score1, score2 = conflict.faction_score_2, conflict.faction_score_1
+                    if faction.name in opponent:
+                        opponent = conflict.faction_name_2
+                        score1, score2 = score2, score1
+                    system = database.fetch_system(__conn, conflict.system_id)
+                    alert = '{stage} conflict against {opponent} in {system}. Score: {score1} - {score2}'
+                    alert = alert.format(stage=conflict.stage.capitalize(), opponent=opponent, system=system.name,
+                                         score1=score1, score2=score2)
+                    alert_entry['alerts'].append((alert, 'conflict'))
+            if len(alert_entry['alerts']) > 0:
+                alert_entry['alerts'] = sorted(alert_entry['alerts'], key=lambda s: s[1])
+                alerts.append(alert_entry)
+                alert_count += len(alert_entry['alerts'])
+        alerts = sorted(alerts, key=lambda s: s['name'])
+    elif order is 'system':
+        systems = database.fetch_system(__conn)
+
+        for system in systems:
+            alert_entry = {
+                'id': system.system_id,
+                'name': system.name,
+                'alerts': []
+            }
+            presences = database.fetch_presence(__conn, sys_id=system.system_id)
+            for presence in presences:
+                faction = database.fetch_faction(__conn, presence.faction_id)
+                # check if faction is in retreat
+                try:
+                    retreat = database.fetch_retreat(__conn, fac_id=faction.faction_id, sys_id=system.system_id)
+                    date_detected = retreat.detected_on.split()[0]
+                    alert = '{faction} in {stage} retreat  detected on {detected}'
+                    alert = alert.format(faction=faction.name, stage=retreat.stage, detected=date_detected)
+                    alert_entry['alerts'].append((alert, 'warning'))
+                except TypeError:
+                    pass
+                # check if there was a large influence swing
+                inf_difference = round((presence.influence[0] - presence.influence[1]) * 100, 1)
+                if abs(inf_difference) > 2:
+                    alert = '{faction} influence swung by {swing}%'
+                    alert = alert.format(faction=faction.name, swing=inf_difference)
+                    level = 'bonus'
+                    if inf_difference < 0:
+                        level = 'warning'
+                    alert_entry['alerts'].append((alert, level))
+                if not presence.system_id == faction.home_system_id:
+                    # check if influence is in danger of retreat state
+                    influence = round(presence.influence[0]*100, 1)
+                    if influence < 9:
+                        # check conflicts
+                        if not faction.conflict_flags == 0:
+                            try:
+                                conflict = database.fetch_conflict(__conn, sys_id=system.system_id, fac_name=faction.name)
+                                opponent = conflict.faction_name_1
+                                if faction.name in opponent:
+                                    opponent = conflict.faction_name_2
+                                alert = '{faction} influence may drop below 5% if conflict against {opponent} is lost'
+                                alert = alert.format(faction=faction.name, opponent=opponent)
+                                alert_entry['alerts'].append((alert, 'warning'))
+                            except TypeError:
+                                pass
+                        elif influence < 5:
+                            alert = '{faction} influence is below 5%'
+                            alert = alert.format(faction=faction.name)
                             alert_entry['alerts'].append((alert, 'warning'))
-                        except TypeError:
-                            pass
-                    elif influence < 5:
-                        alert = 'Influence below 5% in {system}'
-                        alert = alert.format(system=system.name)
-                        alert_entry['alerts'].append((alert, 'warning'))
-        try:
-            expansion = database.fetch_expansion(__conn, fac_id=faction.faction_id)
-            date_detected = expansion.detected_on.split()[0]
-            alert = '{stage} expansion detected on {detected}'
-            alert = alert.format(stage=expansion.stage, detected=date_detected)
-            alert_entry['alerts'].append((alert, 'bonus'))
-            if expansion.system_id is None and anonymous is False:
-                alert = 'Expansion is not being tracked (WIP)'
-                alert_entry['alerts'].append((alert, 'info'))
-        except TypeError:
-            pass
-        conflicts = database.fetch_conflict(__conn, fac_name=faction.name)
-        for conflict in conflicts:
-            fac_1 = database.fetch_faction(__conn, conflict.faction_name_1)
-            fac_2 = database.fetch_faction(__conn, conflict.faction_name_2)
-            if not (fac_1.home_system_id is fac_2.home_system_id is conflict.system_id):
-                opponent = conflict.faction_name_1
-                score1, score2 = conflict.faction_score_2, conflict.faction_score_1
-                if faction.name in opponent:
-                    opponent = conflict.faction_name_2
-                    score1, score2 = score2, score1
-                system = database.fetch_system(__conn, conflict.system_id)
-                alert = '{stage} conflict against {opponent} in {system}. Score: {score1} - {score2}'
-                alert = alert.format(stage=conflict.stage.capitalize(), opponent=opponent, system=system.name,
-                                     score1=score1, score2=score2)
-                alert_entry['alerts'].append((alert, 'conflict'))
-        if len(alert_entry['alerts']) > 0:
-            alert_entry['alerts'] = sorted(alert_entry['alerts'], key=lambda s: s[1])
-            alerts.append(alert_entry)
-            alert_count += len(alert_entry['alerts'])
-    alerts = sorted(alerts, key=lambda s: s['name'])
+            try:
+                expansions = database.fetch_expansion(__conn, sys_id=system.system_id)
+                for expansion in expansions:
+                    date_detected = expansion.detected_on.split()[0]
+                    alert = '{faction} in {stage} expansion detected on {detected}'
+                    alert = alert.format(faction=faction.name, stage=expansion.stage, detected=date_detected)
+                    alert_entry['alerts'].append((alert, 'bonus'))
+                    if expansion.system_id is None and anonymous is False:
+                        alert = 'Expansion is not being tracked (WIP)'
+                        alert_entry['alerts'].append((alert, 'info'))
+            except TypeError:
+                pass
+            conflicts = database.fetch_conflict(__conn, sys_id=system.system_id)
+            for conflict in conflicts:
+                fac_1 = database.fetch_faction(__conn, conflict.faction_name_1)
+                fac_2 = database.fetch_faction(__conn, conflict.faction_name_2)
+                if not (fac_1.home_system_id is fac_2.home_system_id is conflict.system_id):
+                    opponent = conflict.faction_name_1
+                    score1, score2 = conflict.faction_score_2, conflict.faction_score_1
+                    if faction.name in opponent:
+                        opponent = conflict.faction_name_2
+                        score1, score2 = score2, score1
+                    system = database.fetch_system(__conn, conflict.system_id)
+                    alert = '{stage} conflict between {faction} and {opponent}. Score: {score1} - {score2}'
+                    alert = alert.format(stage=conflict.stage.capitalize(), faction=faction.name, opponent=opponent,
+                                         score1=score1, score2=score2)
+                    alert_entry['alerts'].append((alert, 'conflict'))
+            if len(alert_entry['alerts']) > 0:
+                alert_entry['alerts'] = sorted(alert_entry['alerts'], key=lambda s: s[1])
+                alerts.append(alert_entry)
+                alert_count += len(alert_entry['alerts'])
+        alerts = sorted(alerts, key=lambda s: s['name'])
     return alerts, alert_count
 
 
