@@ -78,16 +78,19 @@ def get_alerts(anonymous):
             pass
         conflicts = database.fetch_conflict(__conn, fac_name=faction.name)
         for conflict in conflicts:
-            opponent = conflict.faction_name_1
-            score1, score2 = conflict.faction_score_2, conflict.faction_score_1
-            if faction.name in opponent:
-                opponent = conflict.faction_name_2
-                score1, score2 = score2, score1
-            system = database.fetch_system(__conn, conflict.system_id)
-            alert = '{stage} conflict against {opponent} in {system}. Score: {score1} - {score2}'
-            alert = alert.format(stage=conflict.stage.capitalize(), opponent=opponent, system=system.name,
-                                 score1=score1, score2=score2)
-            alert_entry['alerts'].append((alert, 'conflict'))
+            fac_1 = database.fetch_faction(__conn, conflict.faction_name_1)
+            fac_2 = database.fetch_faction(__conn, conflict.faction_name_2)
+            if not (fac_1.home_system_id is fac_2.home_system_id is conflict.system_id):
+                opponent = conflict.faction_name_1
+                score1, score2 = conflict.faction_score_2, conflict.faction_score_1
+                if faction.name in opponent:
+                    opponent = conflict.faction_name_2
+                    score1, score2 = score2, score1
+                system = database.fetch_system(__conn, conflict.system_id)
+                alert = '{stage} conflict against {opponent} in {system}. Score: {score1} - {score2}'
+                alert = alert.format(stage=conflict.stage.capitalize(), opponent=opponent, system=system.name,
+                                     score1=score1, score2=score2)
+                alert_entry['alerts'].append((alert, 'conflict'))
         if len(alert_entry['alerts']) > 0:
             alert_entry['alerts'] = sorted(alert_entry['alerts'], key=lambda s: s[1])
             alerts.append(alert_entry)
