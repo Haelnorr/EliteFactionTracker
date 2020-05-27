@@ -418,6 +418,57 @@ def get_all_factions():
     return master, child
 
 
+def get_non_natives_data():
+    """
+    Gets a list of all non-native factions in each system, their influence and position
+    :return:
+    """
+    """
+        Gets a list of all systems
+        :return: system name, ID and number of factions as a list of dicts
+        """
+    sql = 'SELECT * FROM System'
+    systems = database.query(__conn, sql)
+    results = []
+    for system in systems:
+        system = classes.System(system)
+        presences = database.fetch_presence(__conn, sys_id=system.system_id)
+        presence_unsorted = []
+        for presence in presences:
+            faction = database.fetch_faction(__conn, presence.faction_id)
+            data = {
+                'name': faction.name,
+                'id': faction.faction_id,
+                'influence1': str(round(presence.influence[0]*100, 1)) + '%',
+                'influence2': str(round(presence.influence[1]*100, 1)) + '%',
+                'influence3': str(round(presence.influence[2]*100, 1)) + '%',
+                'position': 0,
+                'home_system_id': faction.home_system_id
+            }
+            presence_unsorted.append(data)
+        presence_sorted = sorted(presence_unsorted, key=lambda f: float(f['influence1'].strip('%')), reverse=True)
+
+        length = len(presence_sorted)
+        i = 0
+        non_natives = []
+        while i < length:
+            faction_entry = presence_sorted[i]
+            faction_entry['position'] = i + 1
+            if faction_entry['home_system_id'] is not system.system_id:
+                non_natives.append(faction_entry)
+            i += 1
+
+        updated = time_since(system.updated_at)
+        data = {
+            'name': system.name,
+            'id': system.system_id,
+            'non_natives': non_natives,
+            'updated': updated
+        }
+        results.append(data)
+    return results
+
+
 def time_since(timestamp):
     """
     Calculates the time since the timestamp provided from the database
