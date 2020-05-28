@@ -1,6 +1,4 @@
-from urllib import parse
-
-from flask import render_template, redirect, flash, url_for, request
+from flask import render_template, redirect, flash, url_for, request, make_response
 from . import dash_app, db, forms
 from ...definitions import VERSION, ROOT_DIR
 from .. import datafetch
@@ -29,12 +27,30 @@ def dash_redirect():
 
 @dash_app.route('/')
 def dashboard():
-    alert_data = datafetch.get_alerts(current_user.is_anonymous)
+    order = request.cookies.get('alert_sort')
+    if order is None or 'system' in order:
+        order = 'system'
+    if 'faction' in order:
+        order = 'faction'
+    alert_data = datafetch.get_alerts(current_user.is_anonymous, order=order)
     alert_list = alert_data[0]
     alert_count = (alert_data[1], len(alert_list))
     factions = datafetch.get_tracked_factions()
     notice_list = Notice.query.filter(or_(Notice.expiry > datetime.utcnow(), None == Notice.expiry)).filter(Notice.priority == 1)
-    return render_template('index.html', page='Dashboard', alerts=alert_list, alert_count=alert_count, factions=factions, notices=notice_list)
+    resp = make_response(render_template('index.html', page='Dashboard', alerts=alert_list, alert_count=alert_count, factions=factions, notices=notice_list, order=order))
+    return resp
+
+
+@dash_app.route('/sort-by')
+def set_order_cookie():
+    order = request.cookies.get('alert_sort')
+    if order is None or 'faction' in order:
+        order = 'system'
+    elif 'system' in order:
+        order = 'faction'
+    resp = make_response(redirect(url_for('dashboard')))
+    resp.set_cookie('alert_sort', order)
+    return resp
 
 
 @dash_app.route('/about')
@@ -43,10 +59,10 @@ def about():
 
 
 @dash_app.route('/faction')
-@dash_app.route('/faction/<fac_id>')
-def faction(fac_id=None):
-    if fac_id is not None:
-        faction_data = datafetch.get_faction(fac_id)
+@dash_app.route('/faction/<sf_id>')
+def faction(sf_id=None):
+    if sf_id is not None:
+        faction_data = datafetch.get_faction(sf_id)
         template = render_template('faction.html', page='Factions', faction=True, data=faction_data)
     else:
         factions = datafetch.get_all_factions()
@@ -55,15 +71,21 @@ def faction(fac_id=None):
 
 
 @dash_app.route('/system')
-@dash_app.route('/system/<sys_id>')
-def system(sys_id=None):
-    if sys_id is not None:
-        system_data = datafetch.get_system(sys_id)
+@dash_app.route('/system/<sf_id>')
+def system(sf_id=None):
+    if sf_id is not None:
+        system_data = datafetch.get_system(sf_id)
         template = render_template('system.html', page='Systems', system=True, data=system_data)
     else:
         systems = datafetch.get_all_systems()
         template = render_template('system.html', page='Systems', system=False, data=systems)
     return template
+
+
+@dash_app.route('/non-natives')
+def non_natives():
+    results = datafetch.get_non_natives_data()
+    return render_template('non_natives.html', page='Non-Natives', results=results)
 
 
 @dash_app.route('/manage')
