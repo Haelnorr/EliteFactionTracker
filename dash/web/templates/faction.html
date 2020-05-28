@@ -13,7 +13,7 @@
         </tr>
         {% for system in data[1] %}
         <tr class="content-row">
-            <td><a href="{{ url_for('system', sf_id=system['id']) }}">{{ system["name"] }}</a></td>
+            <td><a href="{{ url_for('system', sys_id=system['id']) }}">{{ system["name"] }}</a></td>
             <td>{{ system["influence"] }}</td>
             <td>
                 {% if system["states"]|length == 0 %}
@@ -45,10 +45,10 @@
         </tr>
         {% for conflict in data[2] %}
         <tr class="content-row">
-            <td><a href="{{ url_for('system', sf_id=conflict['system_id']) }}">{{ conflict["system_name"] }}</a></td>
+            <td><a href="{{ url_for('system', sys_id=conflict['system_id']) }}">{{ conflict["system_name"] }}</a></td>
             <td>{{ conflict["stake_at_risk"] }}</td>
             <td>{{ conflict["score"] }}</td>
-            <td><a href="{{ url_for('faction', sf_id=conflict['opponent_id']) }}">{{ conflict["opponent"] }}</a></td>
+            <td><a href="{{ url_for('faction', fac_id=conflict['opponent_id']) }}">{{ conflict["opponent"] }}</a></td>
             <td>{{ conflict["stake_to_win"] }}</td>
             <td>{{ conflict["stage"] }}</td>
             <td>{{ conflict["date_started"] }}</td>
@@ -66,7 +66,7 @@
         </tr>
         {% for faction in data[0] %}
         <tr class="content-row">
-            <td><a href="{{ url_for('faction', sf_id=faction['id']) }}">{{ faction["name"] }}</a></td>
+            <td><a href="{{ url_for('faction', fac_id=faction['id']) }}">{{ faction["name"] }}</a></td>
             <td>{{ faction["updated"] }}</td>
         </tr>
         {% endfor %}
@@ -79,7 +79,7 @@
         </tr>
         {% for faction in data[1] %}
         <tr class="content-row">
-            <td><a href="{{ url_for('faction', sf_id=faction['id']) }}">{{ faction["name"] }}</a></td>
+            <td><a href="{{ url_for('faction', fac_id=faction['id']) }}">{{ faction["name"] }}</a></td>
             <td>{{ faction["updated"] }}</td>
         </tr>
         {% endfor %}
@@ -101,7 +101,7 @@
         </tr>
         {% for system in data[1] %}
         <tr class="content-row">
-            <td><a href="{{ url_for('system', sf_id=system['id']) }}">{{ system["name"] }}</a></td>
+            <td><a href="{{ url_for('system', sys_id=system['id']) }}">{{ system["name"] }}</a></td>
             <td>{{ system["influence"] }}</td>
             <td>
                 {% if system["states"]|length == 0 %}
@@ -133,10 +133,10 @@
         </tr>
         {% for conflict in data[2] %}
         <tr class="content-row">
-            <td><a href="{{ url_for('system', sf_id=conflict['system_id']) }}">{{ conflict["system_name"] }}</a></td>
+            <td><a href="{{ url_for('system', sys_id=conflict['system_id']) }}">{{ conflict["system_name"] }}</a></td>
             <td>{{ conflict["stake_at_risk"] }}</td>
             <td>{{ conflict["score"] }}</td>
-            <td><a href="{{ url_for('faction', sf_id=conflict['opponent_id']) }}">{{ conflict["opponent"] }}</a></td>
+            <td><a href="{{ url_for('faction', fac_id=conflict['opponent_id']) }}">{{ conflict["opponent"] }}</a></td>
             <td>{{ conflict["stake_to_win"] }}</td>
             <td>{{ conflict["stage"] }}</td>
             <td>{{ conflict["date_started"] }}</td>
@@ -154,7 +154,7 @@
         </tr>
         {% for faction in data[0] %}
         <tr class="content-row">
-            <td><a href="{{ url_for('faction', sf_id=faction['id']) }}">{{ faction["name"] }}</a></td>
+            <td><a href="{{ url_for('faction', fac_id=faction['id']) }}">{{ faction["name"] }}</a></td>
             <td>{{ faction["updated"] }}</td>
         </tr>
         {% endfor %}
@@ -167,7 +167,7 @@
         </tr>
         {% for faction in data[1] %}
         <tr class="content-row">
-            <td><a href="{{ url_for('faction', sf_id=faction['id']) }}">{{ faction["name"] }}</a></td>
+            <td><a href="{{ url_for('faction', fac_id=faction['id']) }}">{{ faction["name"] }}</a></td>
             <td>{{ faction["updated"] }}</td>
         </tr>
         {% endfor %}

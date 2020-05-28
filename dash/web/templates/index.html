@@ -7,7 +7,7 @@
             <h4>Tracked Factions</h4>
             {% for faction in factions %}
             <div class="faction-tile">
-                <a href="{{ url_for('faction', sf_id=faction['id']) }}">{{ faction["name"] }}</a>
+                <a href="{{ url_for('faction', fac_id=faction['id']) }}">{{ faction["name"] }}</a>
                 <span>Systems: {{ faction["systems"] }}</span>
                 <span>Controlling: {{ faction["controlling"] }}</span>
                 <span>Conflicts: {{ faction["conflicts"] }}</span>
@@ -20,16 +20,15 @@
     <hr>
     <hr>
     <br>
-        <h4>Alerts</h4>
-        Sorted by {{ order }} (<a href="{{ url_for('set_order_cookie') }}">change</a>)
+    <h4>Alerts</h4>
         {% if alert_count[0] == 0 %}
         <h5>There are no alerts</h5>
         {% else %}
-        <p>There are {{ alert_count[0] }} alerts for {{ alert_count[1] }} {{ order }}s</p>
-        {% for item in alerts %}
+        <p>There are {{ alert_count[0] }} alerts for {{ alert_count[1] }} factions</p>
+        {% for faction in alerts %}
         <div class="alert-block">
-            <h5><a href="{{ url_for(order, sf_id=item['id']) }}">{{ item["name"] }}</a></h5>
-                {% for alert in item["alerts"] %}
+            <h5><a href="{{ url_for('faction', fac_id=faction['id']) }}">{{ faction["name"] }}</a></h5>
+                {% for alert in faction["alerts"] %}
                 <div>
                     <div class="alert-{{ alert[1] }}">
                         {{ alert[0] }}
@@ -79,15 +78,14 @@
     <h2>Dashboard</h2>
     <div id="index-left">
         <h4>Alerts</h4>
-        Sorted by {{ order }} (<a href="{{ url_for('set_order_cookie') }}">change</a>)
         {% if alert_count[0] == 0 %}
         <h5>There are no alerts</h5>
         {% else %}
-        <p>There are {{ alert_count[0] }} alerts for {{ alert_count[1] }} {{ order }}s</p>
-        {% for item in alerts %}
+        <p>There are {{ alert_count[0] }} alerts for {{ alert_count[1] }} factions</p>
+        {% for faction in alerts %}
         <div class="alert-block">
-            <h5><a href="{{ url_for(order, sf_id=item['id']) }}">{{ item["name"] }}</a></h5>
-                {% for alert in item["alerts"] %}
+            <h5><a href="{{ url_for('faction', fac_id=faction['id']) }}">{{ faction["name"] }}</a></h5>
+                {% for alert in faction["alerts"] %}
                 <div>
                     <div class="alert-{{ alert[1] }}">
                         {{ alert[0] }}
@@ -103,7 +101,7 @@
             <h4>Tracked Factions</h4>
             {% for faction in factions %}
             <div class="faction-tile">
-                <a href="{{ url_for('faction', sf_id=faction['id']) }}">{{ faction["name"] }}</a>
+                <a href="{{ url_for('faction', fac_id=faction['id']) }}">{{ faction["name"] }}</a>
                 <span>Systems: {{ faction["systems"] }}</span>
                 <span>Controlling: {{ faction["controlling"] }}</span>
                 <span>Conflicts: {{ faction["conflicts"] }}</span>
