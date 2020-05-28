@@ -16,12 +16,12 @@
         </tr>
         {% for faction in data[1] %}
         <tr class="content-row">
-            <td><a href="{{ url_for('faction', fac_id=faction['id']) }}">{{ faction["name"] }}</a></td>
+            <td><a href="{{ url_for('faction', sf_id=faction['id']) }}">{{ faction["name"] }}</a></td>
             <td>{{ faction["influence1"] }}</td>
             {% if faction["home_system"]["name"] == None %}
             <td>Not tracked</td>
             {% else %}
-            <td><a href="{{ url_for('system', sys_id=faction['home_system']['id']) }}">{{ faction["home_system"]["name"] }}</a></td>
+            <td><a href="{{ url_for('system', sf_id=faction['home_system']['id']) }}">{{ faction["home_system"]["name"] }}</a></td>
             {% endif %}
             <td>{{ faction["expansion"] }}</td>
             <td>{{ faction["conflict"] }}</td>
@@ -69,7 +69,7 @@
         </tr>
         {% for sys in data %}
         <tr class="content-row">
-            <td><a href="{{ url_for('system', sys_id=sys['id']) }}">{{ sys["name"] }}</a></td>
+            <td><a href="{{ url_for('system', sf_id=sys['id']) }}">{{ sys["name"] }}</a></td>
             <td>{{ sys["num_factions"] }}</td>
             <td>{{ sys["updated"] }}</td>
         </tr>
@@ -95,12 +95,12 @@
         </tr>
         {% for faction in data[1] %}
         <tr class="content-row">
-            <td><a href="{{ url_for('faction', fac_id=faction['id']) }}">{{ faction["name"] }}</a></td>
+            <td><a href="{{ url_for('faction', sf_id=faction['id']) }}">{{ faction["name"] }}</a></td>
             <td>{{ faction["influence1"] }}</td>
             {% if faction["home_system"]["name"] == None %}
             <td>Not tracked</td>
             {% else %}
-            <td><a href="{{ url_for('system', sys_id=faction['home_system']['id']) }}">{{ faction["home_system"]["name"] }}</a></td>
+            <td><a href="{{ url_for('system', sf_id=faction['home_system']['id']) }}">{{ faction["home_system"]["name"] }}</a></td>
             {% endif %}
             <td>{{ faction["expansion"] }}</td>
             <td>{{ faction["conflict"] }}</td>
@@ -148,7 +148,7 @@
         </tr>
         {% for sys in data %}
         <tr class="content-row">
-            <td><a href="{{ url_for('system', sys_id=sys['id']) }}">{{ sys["name"] }}</a></td>
+            <td><a href="{{ url_for('system', sf_id=sys['id']) }}">{{ sys["name"] }}</a></td>
             <td>{{ sys["num_factions"] }}</td>
             <td>{{ sys["updated"] }}</td>
         </tr>
