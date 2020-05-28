@@ -44,10 +44,10 @@ def dashboard():
 @dash_app.route('/sort-by')
 def set_order_cookie():
     order = request.cookies.get('alert_sort')
-    if order is None or 'faction' in order:
-        order = 'system'
-    elif 'system' in order:
+    if order is None or 'system' in order:
         order = 'faction'
+    elif 'faction' in order:
+        order = 'system'
     resp = make_response(redirect(url_for('dashboard')))
     resp.set_cookie('alert_sort', order)
     return resp
