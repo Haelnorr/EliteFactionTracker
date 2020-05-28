@@ -80,6 +80,7 @@
             <a href="{{ url_for('system') }}">Systems</a>
             <a href="{{ url_for('faction') }}">Factions</a>
             <a href="{{ url_for('notices') }}">Notices</a>
+            <a href="{{ url_for('non_natives') }}">Non-Natives (BETA)</a>
             <div id="manage">
             {% if current_user.is_anonymous %}
             <a href="{{ url_for('login') }}">Manage</a>
