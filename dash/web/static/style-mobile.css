@@ -330,3 +330,19 @@ footer {
     border: 2px solid #821704;
     color: #e3e3e3;
 }
+
+
+.table-break {
+    background-color: #212121;
+    border: 2px solid #212121;
+}
+
+.cell-green {
+    color: #07fc03;
+    font-weight: bold;
+}
+
+.cell-red {
+    color: #ff5900;
+    font-weight: bold;
+}
