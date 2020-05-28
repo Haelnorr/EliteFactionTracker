@@ -82,6 +82,12 @@ def system(sf_id=None):
     return template
 
 
+@dash_app.route('/non-natives')
+def non_natives():
+    results = datafetch.get_non_natives_data()
+    return render_template('non_natives.html', page='Non-Natives', results=results)
+
+
 @dash_app.route('/manage')
 @login_required
 def manage():

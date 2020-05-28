@@ -429,7 +429,12 @@ def get_non_natives_data():
         """
     sql = 'SELECT * FROM System'
     systems = database.query(__conn, sql)
-    results = []
+    master = database.query(__conn, 'SELECT faction_id, name FROM Faction WHERE master=0')[0]
+    results = {
+        'master_name': master[1],
+        'data': [],
+        'max_count': 0
+    }
     for system in systems:
         system = classes.System(system)
         presences = database.fetch_presence(__conn, sys_id=system.system_id)
@@ -443,7 +448,8 @@ def get_non_natives_data():
                 'influence2': str(round(presence.influence[1]*100, 1)) + '%',
                 'influence3': str(round(presence.influence[2]*100, 1)) + '%',
                 'position': 0,
-                'home_system_id': faction.home_system_id
+                'home_system_id': faction.home_system_id,
+                'highlight': 'green'
             }
             presence_unsorted.append(data)
         presence_sorted = sorted(presence_unsorted, key=lambda f: float(f['influence1'].strip('%')), reverse=True)
@@ -451,21 +457,68 @@ def get_non_natives_data():
         length = len(presence_sorted)
         i = 0
         non_natives = []
+        master_inf = ''
+        master_pos = 0
         while i < length:
             faction_entry = presence_sorted[i]
             faction_entry['position'] = i + 1
-            if faction_entry['home_system_id'] is not system.system_id:
-                non_natives.append(faction_entry)
+            if not faction_entry['home_system_id'] == system.system_id:
+                if not faction_entry['id'] == master[0]:
+                    non_natives.append(faction_entry)
+                else:
+                    master_inf = faction_entry['influence1']
+                    master_pos = faction_entry['position']
+            if faction_entry['home_system_id'] == system.system_id and faction_entry['id'] == master[0]:
+                master_inf = faction_entry['influence1']
+                master_pos = faction_entry['position']
             i += 1
+        good_pos = [1, 2, 3, 4, 5]
+        good_pos = good_pos[:(len(non_natives)+1)]
+        if int(master_pos) not in good_pos:
+            good_pos = good_pos[:(len(good_pos)-1)]
+        i = 0
+        while i < len(non_natives):
+            if int(non_natives[i]['position']) not in good_pos:
+                non_natives[i]['highlight'] = 'red'
+            if i > 0:
+                pos_diff = (non_natives[i]['position'] - non_natives[i-1]['position'])
+                if pos_diff > 1:
+                    if pos_diff == 2 and not (non_natives[i]['position'] - master_pos) == 1:
+                        non_natives[i]['highlight'] = 'red'
+                if non_natives[i-1]['highlight'] == 'red':
+                    non_natives[i]['highlight'] = 'red'
+            i += 1
+
+        blank = {
+            'name': '',
+            'id': '',
+            'influence1': '',
+            'influence2': '',
+            'influence3': '',
+            'position': '',
+            'home_system_id': ''
+        }
+        if len(non_natives) < 4:
+            if results['max_count'] < len(non_natives):
+                results['max_count'] = len(non_natives)
+            i = 4 - len(non_natives)
+            while i > 0:
+                non_natives.append(blank)
+                i -= 1
 
         updated = time_since(system.updated_at)
         data = {
             'name': system.name,
             'id': system.system_id,
+            'master_pos': master_pos,
+            'master_inf': master_inf,
             'non_natives': non_natives,
             'updated': updated
         }
-        results.append(data)
+        results['data'].append(data)
+    if results['max_count'] < 4:
+        for system in results['data']:
+            system['non_natives'] = system['non_natives'][:results['max_count']]
     return results
 
 
