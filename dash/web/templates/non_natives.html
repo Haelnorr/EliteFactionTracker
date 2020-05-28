@@ -23,7 +23,7 @@
             {% for faction in system["non_natives"] %}
                 <td class="table-break"></td>
                 <td><a href="{{ url_for('faction', sf_id=faction['id']) }}">{{ faction["name"] }}</a></td>
-                <td>{{ faction["position"] }}</td>
+                <td class="cell-{{ faction['highlight'] }}">{{ faction["position"] }}</td>
                 <td>{{ faction["influence1"] }}</td>
                 <td>{{ faction["influence2"] }}</td>
                 <td>{{ faction["influence3"] }}</td>
