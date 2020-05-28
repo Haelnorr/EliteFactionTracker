@@ -201,10 +201,10 @@ footer {
 
 .title-row {
     margin: 0;
+    background-color: #bb5500;
 }
 
 .title-row td {
-    background-color: #bb5500;
     padding: 10px 25px;
     border-right: 2px solid black;
 }

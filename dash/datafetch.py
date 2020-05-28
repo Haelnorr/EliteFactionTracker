@@ -164,15 +164,9 @@ def get_alerts(anonymous, order='system'):
                 fac_1 = database.fetch_faction(__conn, conflict.faction_name_1)
                 fac_2 = database.fetch_faction(__conn, conflict.faction_name_2)
                 if not (fac_1.home_system_id is fac_2.home_system_id is conflict.system_id):
-                    opponent = conflict.faction_name_1
-                    score1, score2 = conflict.faction_score_2, conflict.faction_score_1
-                    if faction.name in opponent:
-                        opponent = conflict.faction_name_2
-                        score1, score2 = score2, score1
-                    system = database.fetch_system(__conn, conflict.system_id)
                     alert = '{stage} conflict between {faction} and {opponent}. Score: {score1} - {score2}'
-                    alert = alert.format(stage=conflict.stage.capitalize(), faction=faction.name, opponent=opponent,
-                                         score1=score1, score2=score2)
+                    alert = alert.format(stage=conflict.stage.capitalize(), faction=conflict.faction_name_1, opponent=conflict.faction_name_2,
+                                         score1=conflict.faction_score_1, score2=conflict.faction_score_2)
                     alert_entry['alerts'].append((alert, 'conflict'))
             if len(alert_entry['alerts']) > 0:
                 alert_entry['alerts'] = sorted(alert_entry['alerts'], key=lambda s: s[1])
