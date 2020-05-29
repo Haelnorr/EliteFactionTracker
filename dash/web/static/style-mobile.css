@@ -346,3 +346,8 @@ footer {
     color: #ff5900;
     font-weight: bold;
 }
+
+.cell-warn {
+    color: #f0dc07;
+    font-weight: bold;
+}

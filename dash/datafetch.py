@@ -435,6 +435,13 @@ def get_non_natives_data():
         presence_unsorted = []
         for presence in presences:
             faction = database.fetch_faction(__conn, presence.faction_id)
+            inf1_highlight = inf2_highlight = inf3_highlight = 'none'
+            if presence.influence[0] < 0.05:
+                inf1_highlight = 'warn'
+            if presence.influence[1] < 0.05:
+                inf2_highlight = 'warn'
+            if presence.influence[2] < 0.05:
+                inf3_highlight = 'warn'
             data = {
                 'name': faction.name,
                 'id': faction.faction_id,
@@ -443,7 +450,10 @@ def get_non_natives_data():
                 'influence3': str(round(presence.influence[2]*100, 1)) + '%',
                 'position': 0,
                 'home_system_id': faction.home_system_id,
-                'highlight': 'green'
+                'pos_highlight': 'green',
+                'inf1_highlight': inf1_highlight,
+                'inf2_highlight': inf2_highlight,
+                'inf3_highlight': inf3_highlight
             }
             presence_unsorted.append(data)
         presence_sorted = sorted(presence_unsorted, key=lambda f: float(f['influence1'].strip('%')), reverse=True)
@@ -473,14 +483,14 @@ def get_non_natives_data():
         i = 0
         while i < len(non_natives):
             if int(non_natives[i]['position']) not in good_pos:
-                non_natives[i]['highlight'] = 'red'
+                non_natives[i]['pos_highlight'] = 'red'
             if i > 0:
                 pos_diff = (non_natives[i]['position'] - non_natives[i-1]['position'])
                 if pos_diff > 1:
                     if pos_diff == 2 and not (non_natives[i]['position'] - master_pos) == 1:
-                        non_natives[i]['highlight'] = 'red'
-                if non_natives[i-1]['highlight'] == 'red':
-                    non_natives[i]['highlight'] = 'red'
+                        non_natives[i]['pos_highlight'] = 'red'
+                if non_natives[i-1]['pos_highlight'] == 'red':
+                    non_natives[i]['pos_highlight'] = 'red'
             i += 1
 
         blank = {

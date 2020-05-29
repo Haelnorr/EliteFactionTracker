@@ -23,10 +23,10 @@
             {% for faction in system["non_natives"] %}
                 <td class="table-break"></td>
                 <td><a href="{{ url_for('faction', sf_id=faction['id']) }}">{{ faction["name"] }}</a></td>
-                <td class="cell-{{ faction['highlight'] }}">{{ faction["position"] }}</td>
-                <td>{{ faction["influence1"] }}</td>
-                <td>{{ faction["influence2"] }}</td>
-                <td>{{ faction["influence3"] }}</td>
+                <td class="cell-{{ faction['pos_highlight'] }}">{{ faction["position"] }}</td>
+                <td class="cell-{{ faction['inf1_highlight'] }}">{{ faction["influence1"] }}</td>
+                <td class="cell-{{ faction['inf2_highlight'] }}">{{ faction["influence2"] }}</td>
+                <td class="cell-{{ faction['inf3_highlight'] }}">{{ faction["influence3"] }}</td>
             {% endfor %}
         </tr>
         {% endfor %}
@@ -57,10 +57,10 @@
             {% for faction in system["non_natives"] %}
                 <td class="table-break"></td>
                 <td><a href="{{ url_for('faction', sf_id=faction['id']) }}">{{ faction["name"] }}</a></td>
-                <td class="cell-{{ faction['highlight'] }}">{{ faction["position"] }}</td>
-                <td>{{ faction["influence1"] }}</td>
-                <td>{{ faction["influence2"] }}</td>
-                <td>{{ faction["influence3"] }}</td>
+                <td class="cell-{{ faction['pos_highlight'] }}">{{ faction["position"] }}</td>
+                <td class="cell-{{ faction['inf1_highlight'] }}">{{ faction["influence1"] }}</td>
+                <td class="cell-{{ faction['inf2_highlight'] }}">{{ faction["influence2"] }}</td>
+                <td class="cell-{{ faction['inf3_highlight'] }}">{{ faction["influence3"] }}</td>
             {% endfor %}
         </tr>
         {% endfor %}
