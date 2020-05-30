@@ -1,3 +1,5 @@
+import requests
+
 from .. import bgsapi
 from .. import database
 from .. import log
@@ -45,6 +47,8 @@ def __parse_data(system_db, message):
     # that the function returns
 
     # debounce influence data
+    tick_resp = requests.get('http://tick.phelbore.com/api/tick')
+    tick = datetime.strptime(tick_resp.text[1:19], '%Y-%m-%dT%H:%M:%S')
     for faction in message['Factions']:
         influence = faction['Influence']
         faction_name = faction['Name']
@@ -55,11 +59,10 @@ def __parse_data(system_db, message):
 
                 presence_db = database.fetch_presence(db_conn, sys_id=system_db.system_id, fac_id=faction_db.faction_id)
 
-                if not influence == presence_db.influence[1] or not influence == presence_db.influence[2]:
-                    cached = False
-
-                # work on method of debouncing more accurately
-
+                db_timestamp = datetime.strptime(presence_db.updated_at, database.DATETIME_FMT)
+                if db_timestamp < tick:
+                    if not influence == presence_db.influence[0]:
+                        cached = False
                 # group old and new data together and add to list
                 factions.append((faction, faction_db, presence_db))
             except TypeError:   # faction wasn't in the database
