@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% if request.MOBILE %}
+{% block mobile_content %}
+<div id="content-mb">
+    <h2>Influence Trend Data - <a href="{{ url_for('faction', sf_id=trends['master_id']) }}">{{ trends["master_name"] }}</a></h2>
+    <table class="trends-table tables table-scroll">
+        <tr class="title-row">
+            <td>System</td>
+            <td>Current Influence</td>
+            <td colspan="6">Influence History (In order from most recent to least)</td>
+        </tr>
+        {% for system in trends["systems"] %}
+        <tr class="content-row">
+            <td><a href="{{ url_for('system', sf_id=system['id']) }}">{{ system["name"] }}</a></td>
+            {% for influence in system["influence"] %}
+                <td>{{ influence }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}
+{% else %}
+{% block content %}
+<div id="content">
+    <h2>Influence Trend Data - <a href="{{ url_for('faction', sf_id=trends['master_id']) }}">{{ trends["master_name"] }}</a></h2>
+    <table class="trends-table tables">
+        <tr class="title-row">
+            <td>System</td>
+            <td>Current Influence</td>
+            <td colspan="6">Influence History (In order from most recent to least)</td>
+        </tr>
+        {% for system in trends["systems"] %}
+        <tr class="content-row">
+            <td><a href="{{ url_for('system', sf_id=system['id']) }}">{{ system["name"] }}</a></td>
+            {% for influence in system["influence"] %}
+                <td class="cell-{{ influence[1] }}">{{ influence[0] }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}
+{% endif %}

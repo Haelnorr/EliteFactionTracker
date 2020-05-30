@@ -351,3 +351,12 @@ footer {
     color: #f0dc07;
     font-weight: bold;
 }
+
+.cell-purple {
+    color: #b86bf2;
+    font-weight: bold;
+}
+
+.trends-table {
+    width: auto;
+}

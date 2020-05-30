@@ -549,6 +549,52 @@ def get_non_natives_data():
     return results
 
 
+def get_trend_data():
+    master_id = database.query(__conn, 'SELECT faction_id FROM Faction WHERE master=0')[0][0]
+    master = database.fetch_faction(__conn, master_id)
+    presences = database.fetch_presence(__conn, fac_id=master_id)
+
+    systems = []
+    for presence in presences:
+        inf_highlight = ['none', 'none', 'none', 'none', 'none', 'none', 'none']
+        system = database.fetch_system(__conn, presence.system_id)
+        i = 0
+        influence = []
+        while i < len(presence.influence):
+            if presence.influence[i] is None:
+                presence.influence[i] = 'No Data'
+            else:
+                if i < 6:
+                    try:
+                        if presence.influence[i] > 0.695:
+                            inf_highlight[i] = 'warn'
+                        elif presence.influence[i] > presence.influence[i+1]:
+                            inf_highlight[i] = 'green'
+                        elif presence.influence[i] < presence.influence[i+1]:
+                            inf_highlight[i] = 'red'
+                        elif presence.influence[i] == presence.influence[i+1]:
+                            inf_highlight[i] = 'purple'
+                    except TypeError:
+                        if presence.influence[i] > 0.695:
+                            inf_highlight[i] = 'warn'
+                presence.influence[i] = str(round(presence.influence[i]*100, 1)) + '%'
+            influence.append((presence.influence[i], inf_highlight[i]))
+            i += 1
+        data = {
+            'name': system.name,
+            'id': system.system_id,
+            'influence': influence,
+            'updated_at': presence.updated_at
+        }
+        systems.append(data)
+    result = {
+        'master_name': master.name,
+        'master_id': master.faction_id,
+        'systems': systems
+    }
+    return result
+
+
 def time_since(timestamp):
     """
     Calculates the time since the timestamp provided from the database

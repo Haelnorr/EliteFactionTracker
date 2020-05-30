@@ -102,6 +102,12 @@ def non_natives():
     return render_template('non_natives.html', page='Non-Natives', results=results)
 
 
+@dash_app.route('/trends')
+def trends():
+    trends_data = datafetch.get_trend_data()
+    return render_template('trends.html', page='Trends', trends=trends_data)
+
+
 @dash_app.route('/manage')
 @login_required
 def manage():
