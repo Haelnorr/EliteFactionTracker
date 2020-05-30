@@ -40,9 +40,13 @@ class Presence:
         self.influence = [
             data[2],
             data[3],
-            data[4]
+            data[4],
+            data[5],
+            data[6],
+            data[7],
+            data[8]
         ]
-        self.updated_at = data[5]
+        self.updated_at = data[9]
 
 
 class Conflict:

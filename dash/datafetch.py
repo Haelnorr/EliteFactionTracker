@@ -224,13 +224,24 @@ def get_system(system):
             pass
 
         update = time_since(presence.updated_at)
-
+        if presence.influence[0] is None:
+            inf1 = 'No Data'
+        else:
+            inf1 = str(round(presence.influence[0] * 100, 1)) + '%'
+        if presence.influence[1] is None:
+            inf2 = 'No Data'
+        else:
+            inf2 = str(round(presence.influence[1] * 100, 1)) + '%'
+        if presence.influence[2] is None:
+            inf3 = 'No Data'
+        else:
+            inf3 = str(round(presence.influence[2] * 100, 1)) + '%'
         row = {
             'id': faction.faction_id,
             'name': faction.name,
-            'influence1': str(round(presence.influence[0]*100, 1)) + '%',
-            'influence2': str(round(presence.influence[1]*100, 1)) + '%',
-            'influence3': str(round(presence.influence[2]*100, 1)) + '%',
+            'influence1': inf1,
+            'influence2': inf2,
+            'influence3': inf3,
             'home_system': home_system,
             'expansion': expansion,
             'conflict': conflict,
@@ -436,18 +447,30 @@ def get_non_natives_data():
         for presence in presences:
             faction = database.fetch_faction(__conn, presence.faction_id)
             inf1_highlight = inf2_highlight = inf3_highlight = 'none'
-            if presence.influence[0] < 0.05:
-                inf1_highlight = 'warn'
-            if presence.influence[1] < 0.05:
-                inf2_highlight = 'warn'
-            if presence.influence[2] < 0.05:
-                inf3_highlight = 'warn'
+            if presence.influence[0] is None:
+                inf1 = 'No Data'
+            else:
+                inf1 = str(round(presence.influence[0]*100, 1)) + '%'
+                if presence.influence[0] < 0.05:
+                    inf1_highlight = 'warn'
+            if presence.influence[1] is None:
+                inf2 = 'No Data'
+            else:
+                inf2 = str(round(presence.influence[1] * 100, 1)) + '%'
+                if presence.influence[1] < 0.05:
+                    inf1_highlight = 'warn'
+            if presence.influence[2] is None:
+                inf3 = 'No Data'
+            else:
+                inf3 = str(round(presence.influence[2] * 100, 1)) + '%'
+                if presence.influence[2] < 0.05:
+                    inf1_highlight = 'warn'
             data = {
                 'name': faction.name,
                 'id': faction.faction_id,
-                'influence1': str(round(presence.influence[0]*100, 1)) + '%',
-                'influence2': str(round(presence.influence[1]*100, 1)) + '%',
-                'influence3': str(round(presence.influence[2]*100, 1)) + '%',
+                'influence1': inf1,
+                'influence2': inf2,
+                'influence3': inf3,
                 'position': 0,
                 'home_system_id': faction.home_system_id,
                 'pos_highlight': 'green',

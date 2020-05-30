@@ -93,6 +93,10 @@ def __create_tables(conn):
         influence REAL,
         influence_old_1 REAL,
         influence_old_2 REAL,
+        influence_old_3 REAL,
+        influence_old_4 REAL,
+        influence_old_5 REAL,
+        influence_old_6 REAL,
         updated_at TIMESTAMP,
 
         PRIMARY KEY (system_id, faction_id),
@@ -272,13 +276,17 @@ def update_presence(conn, data):
     """
     Updates the presence database with the provided data
     :param conn: the database connection object
-    :param data: the data to update (influence, influence_old_1, influence_old_2, updated_at, system_id, faction_id)
+    :param data: the data to update (influence, influence_old_1, influence_old_2, influence_old_3, influence_old_4, influence_old_5, influence_old_6, updated_at, system_id, faction_id)
     :return: null
     """
     sql = '''UPDATE Presence
     SET influence = ? ,
         influence_old_1 = ? ,
         influence_old_2 = ? ,
+        influence_old_3 = ? ,
+        influence_old_4 = ? ,
+        influence_old_5 = ? ,
+        influence_old_6 = ? ,
         updated_at = ?
     WHERE system_id = ? AND faction_id = ?'''
     cur = conn.cursor()
@@ -293,8 +301,8 @@ def new_presence(conn, data):
     :param data: the data to insert (system_id, faction_id, influence, influence_old_1, influence_old_2, updated_at)
     :return: null
     """
-    sql = '''INSERT INTO Presence(system_id, faction_id, influence, influence_old_1, influence_old_2, updated_at)
-            VALUES(?,?,?,?,?,?)
+    sql = '''INSERT INTO Presence(system_id, faction_id, influence, influence_old_1, influence_old_2, influence_old_3, influence_old_4, influence_old_5, influence_old_6, updated_at)
+            VALUES(?,?,?,?,?,?,?,?,?,?)
         '''
     cur = conn.cursor()
     cur.execute(sql, data)

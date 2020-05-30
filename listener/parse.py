@@ -356,6 +356,10 @@ def __parse_data(system_db, message):
                     faction[0]['Influence'],
                     faction[2].influence[0],
                     faction[2].influence[1],
+                    faction[2].influence[2],
+                    faction[2].influence[3],
+                    faction[2].influence[4],
+                    faction[2].influence[5],
                     timestamp,
                     faction[2].system_id,
                     faction[2].faction_id
@@ -383,8 +387,12 @@ def __parse_data(system_db, message):
                     system_db.system_id,
                     faction_api['id'],
                     faction[0]['Influence'],
-                    faction[0]['Influence'],
-                    faction[0]['Influence'],
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
                     timestamp
                 )
                 try:
