@@ -6,7 +6,7 @@ from os import path
 __datetime_fmt = '%Y-%m-%d %H:%M:%S'
 
 __print_to_console = True   # set 'True' for logging to console
-__DEBUG = False            # set 'True' for debug messages
+__DEBUG = True            # set 'True' for debug messages
 
 
 def start(filename):

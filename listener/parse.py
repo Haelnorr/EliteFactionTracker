@@ -63,6 +63,9 @@ def __parse_data(system_db, message):
                 if db_timestamp < tick:
                     if not influence == presence_db.influence[0]:
                         cached = False
+                    elif (datetime.utcnow() - db_timestamp).seconds > 86400:
+                        cached = False
+
                 # group old and new data together and add to list
                 factions.append((faction, faction_db, presence_db))
             except TypeError:   # faction wasn't in the database
@@ -73,7 +76,8 @@ def __parse_data(system_db, message):
                 cached = False
 
     # debounce conflicts if influences are static
-    try:
+    # this has been made redundant by new debounce method (hopefully)
+    """try:
         for conflict in message['Conflicts']:
             try:
                 conflict_db = database.fetch_conflict(db_conn, sys_id=system_db.system_id,
@@ -86,7 +90,7 @@ def __parse_data(system_db, message):
             except TypeError:
                 cached = False
     except KeyError:
-        pass
+        pass"""
 
     timestamp = get_utc_now()
     if cached:

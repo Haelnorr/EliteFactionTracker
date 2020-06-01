@@ -38,7 +38,7 @@ def get_alerts(anonymous, order='system'):
                 except TypeError:
                     pass
                 # check if there was a large influence swing
-                inf_difference = round((presence.influence[0] - presence.influence[1]) * 100, 1)
+                inf_difference = round((presence.influence[0] - presence.influence[1]) * 100, 2)
                 if abs(inf_difference) > 2:
                     alert = 'Influence swung by {swing}% in {system}'
                     alert = alert.format(swing=inf_difference, system=system.name)
@@ -48,7 +48,7 @@ def get_alerts(anonymous, order='system'):
                     alert_entry['alerts'].append((alert, level))
                 if not presence.system_id == faction.home_system_id:
                     # check if influence is in danger of retreat state
-                    influence = round(presence.influence[0]*100, 1)
+                    influence = round(presence.influence[0]*100, 2)
                     if influence < 9:
                         # check conflicts
                         if not faction.conflict_flags == 0:
@@ -119,17 +119,20 @@ def get_alerts(anonymous, order='system'):
                 except TypeError:
                     pass
                 # check if there was a large influence swing
-                inf_difference = round((presence.influence[0] - presence.influence[1]) * 100, 1)
-                if abs(inf_difference) > 2:
-                    alert = '{faction} influence swung by {swing}%'
-                    alert = alert.format(faction=faction.name, swing=inf_difference)
-                    level = 'bonus'
-                    if inf_difference < 0:
-                        level = 'warning'
-                    alert_entry['alerts'].append((alert, level))
+                try:
+                    inf_difference = round((presence.influence[0] - presence.influence[1]) * 100, 2)
+                    if abs(inf_difference) > 2:
+                        alert = '{faction} influence swung by {swing}%'
+                        alert = alert.format(faction=faction.name, swing=inf_difference)
+                        level = 'bonus'
+                        if inf_difference < 0:
+                            level = 'warning'
+                        alert_entry['alerts'].append((alert, level))
+                except TypeError:
+                    pass
                 if not presence.system_id == faction.home_system_id:
                     # check if influence is in danger of retreat state
-                    influence = round(presence.influence[0]*100, 1)
+                    influence = round(presence.influence[0]*100, 2)
                     if influence < 9:
                         # check conflicts
                         if not faction.conflict_flags == 0:
@@ -227,15 +230,15 @@ def get_system(system):
         if presence.influence[0] is None:
             inf1 = 'No Data'
         else:
-            inf1 = str(round(presence.influence[0] * 100, 1)) + '%'
+            inf1 = str(round(presence.influence[0] * 100, 2)) + '%'
         if presence.influence[1] is None:
             inf2 = 'No Data'
         else:
-            inf2 = str(round(presence.influence[1] * 100, 1)) + '%'
+            inf2 = str(round(presence.influence[1] * 100, 2)) + '%'
         if presence.influence[2] is None:
             inf3 = 'No Data'
         else:
-            inf3 = str(round(presence.influence[2] * 100, 1)) + '%'
+            inf3 = str(round(presence.influence[2] * 100, 2)) + '%'
         row = {
             'id': faction.faction_id,
             'name': faction.name,
@@ -323,7 +326,7 @@ def get_faction(faction):
         except TypeError:
             pass
         update = time_since(presence.updated_at)
-        influence = str(round(presence.influence[0]*100, 1)) + '%'
+        influence = str(round(presence.influence[0]*100, 2)) + '%'
         row = {
             'id': system.system_id,
             'name': system.name,
@@ -450,21 +453,21 @@ def get_non_natives_data():
             if presence.influence[0] is None:
                 inf1 = 'No Data'
             else:
-                inf1 = str(round(presence.influence[0]*100, 1)) + '%'
+                inf1 = str(round(presence.influence[0]*100, 2)) + '%'
                 if presence.influence[0] < 0.05:
                     inf1_highlight = 'warn'
             if presence.influence[1] is None:
                 inf2 = 'No Data'
             else:
-                inf2 = str(round(presence.influence[1] * 100, 1)) + '%'
+                inf2 = str(round(presence.influence[1] * 100, 2)) + '%'
                 if presence.influence[1] < 0.05:
-                    inf1_highlight = 'warn'
+                    inf2_highlight = 'warn'
             if presence.influence[2] is None:
                 inf3 = 'No Data'
             else:
-                inf3 = str(round(presence.influence[2] * 100, 1)) + '%'
+                inf3 = str(round(presence.influence[2] * 100, 2)) + '%'
                 if presence.influence[2] < 0.05:
-                    inf1_highlight = 'warn'
+                    inf3_highlight = 'warn'
             data = {
                 'name': faction.name,
                 'id': faction.faction_id,
@@ -577,7 +580,7 @@ def get_trend_data():
                     except TypeError:
                         if presence.influence[i] > 0.695:
                             inf_highlight[i] = 'warn'
-                presence.influence[i] = str(round(presence.influence[i]*100, 1)) + '%'
+                presence.influence[i] = str(round(presence.influence[i]*100, 2)) + '%'
             influence.append((presence.influence[i], inf_highlight[i]))
             i += 1
         data = {
