@@ -478,6 +478,11 @@ footer {
     font-weight: bold;
 }
 
+.cell-blue {
+    color: #4d95fa;
+    font-weight: bold;
+}
+
 .trends-table {
     width: auto;
 }

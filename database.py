@@ -468,7 +468,10 @@ def fetch_conflict(conn, con_id=None, sys_id=None, fac_name=None):
     if con_id is not None:
         sql = '''SELECT * FROM Conflict WHERE conflict_id=?'''
         cur.execute(sql, (con_id,))
-        c = classes.Conflict(cur.fetchone())
+        try:
+            c = classes.Conflict(cur.fetchone())
+        except TypeError:
+            pass
     elif sys_id is not None:
         if fac_name is None:
             sql = '''SELECT * FROM Conflict WHERE system_id=?'''
@@ -479,7 +482,10 @@ def fetch_conflict(conn, con_id=None, sys_id=None, fac_name=None):
         else:
             sql = '''SELECT * FROM Conflict WHERE system_id=? AND (faction_name_1=? OR faction_name_2=?)'''
             cur.execute(sql, (sys_id, fac_name, fac_name))
-            c = classes.Conflict(cur.fetchone())
+            try:
+                c = classes.Conflict(cur.fetchone())
+            except TypeError:
+                pass
     elif fac_name is not None:
         sql = '''SELECT * FROM Conflict WHERE faction_name_1=? or faction_name_2=?'''
         cur.execute(sql, (fac_name, fac_name))

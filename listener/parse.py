@@ -7,6 +7,20 @@ from datetime import datetime
 
 __TIME_FMT = '%Y-%m-%dT%H:%M:%SZ'
 
+__tick_resp = requests.get('http://tick.phelbore.com/api/tick')
+__tick = datetime.strptime(__tick_resp.text[1:19], '%Y-%m-%dT%H:%M:%S')
+
+
+def tick():
+    global __tick
+    now = datetime.utcnow()
+    diff = now - __tick
+    if diff.days > 0:
+        print('updated tick')
+        _tick_resp = requests.get('http://tick.phelbore.com/api/tick')
+        __tick = datetime.strptime(_tick_resp.text[1:19], '%Y-%m-%dT%H:%M:%S')
+    return __tick
+
 
 def parser(pipeline, shutdown):
     """
@@ -47,8 +61,9 @@ def __parse_data(system_db, message):
     # that the function returns
 
     # debounce influence data
-    tick_resp = requests.get('http://tick.phelbore.com/api/tick')
-    tick = datetime.strptime(tick_resp.text[1:19], '%Y-%m-%dT%H:%M:%S')
+
+    latest_tick = tick()
+
     for faction in message['Factions']:
         influence = faction['Influence']
         faction_name = faction['Name']
@@ -60,10 +75,11 @@ def __parse_data(system_db, message):
                 presence_db = database.fetch_presence(db_conn, sys_id=system_db.system_id, fac_id=faction_db.faction_id)
 
                 db_timestamp = datetime.strptime(presence_db.updated_at, database.DATETIME_FMT)
-                if db_timestamp < tick:
+                if db_timestamp < latest_tick:
+                    time_diff = datetime.utcnow() - db_timestamp
                     if not influence == presence_db.influence[0]:
                         cached = False
-                    elif (datetime.utcnow() - db_timestamp).seconds > 86400:
+                    elif time_diff.days > 1 or time_diff.seconds > 80000:
                         cached = False
 
                 # group old and new data together and add to list

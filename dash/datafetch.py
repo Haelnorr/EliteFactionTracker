@@ -52,16 +52,14 @@ def get_alerts(anonymous, order='system'):
                     if influence < 9:
                         # check conflicts
                         if not faction.conflict_flags == 0:
-                            try:
-                                conflict = database.fetch_conflict(__conn, sys_id=system.system_id, fac_name=faction.name)
+                            conflict = database.fetch_conflict(__conn, sys_id=system.system_id, fac_name=faction.name)
+                            if conflict is not None:
                                 opponent = conflict.faction_name_1
                                 if faction.name in opponent:
                                     opponent = conflict.faction_name_2
                                 alert = 'Influence may drop below 5% if conflict against {opponent} is lost in {system}'
                                 alert = alert.format(opponent=opponent, system=system.name)
                                 alert_entry['alerts'].append((alert, 'warning'))
-                            except TypeError:
-                                pass
                         elif influence < 5:
                             alert = 'Influence below 5% in {system}'
                             alert = alert.format(system=system.name)
@@ -136,16 +134,14 @@ def get_alerts(anonymous, order='system'):
                     if influence < 9:
                         # check conflicts
                         if not faction.conflict_flags == 0:
-                            try:
-                                conflict = database.fetch_conflict(__conn, sys_id=system.system_id, fac_name=faction.name)
+                            conflict = database.fetch_conflict(__conn, sys_id=system.system_id, fac_name=faction.name)
+                            if conflict is not None:
                                 opponent = conflict.faction_name_1
                                 if faction.name in opponent:
                                     opponent = conflict.faction_name_2
                                 alert = '{faction} influence may drop below 5% if conflict against {opponent} is lost'
                                 alert = alert.format(faction=faction.name, opponent=opponent)
                                 alert_entry['alerts'].append((alert, 'warning'))
-                            except TypeError:
-                                pass
                         elif influence < 5:
                             alert = '{faction} influence is below 5%'
                             alert = alert.format(faction=faction.name)
@@ -213,11 +209,9 @@ def get_system(system):
 
         conflict = None
         if faction.conflict_flags is not 0:
-            try:
-                conflict_db = database.fetch_conflict(__conn, sys_id=system_db.system_id, fac_name=faction.name)
+            conflict_db = database.fetch_conflict(__conn, sys_id=system_db.system_id, fac_name=faction.name)
+            if conflict_db is not None:
                 conflict = conflict_db.stage
-            except TypeError:
-                pass
 
         retreat = None
         try:
@@ -309,11 +303,9 @@ def get_faction(faction):
         system = database.fetch_system(__conn, presence.system_id)
         states = []
         if faction_db.conflict_flags is not 0:
-            try:
-                conflict = database.fetch_conflict(__conn, sys_id=system.system_id, fac_name=faction_db.name)
+            conflict = database.fetch_conflict(__conn, sys_id=system.system_id, fac_name=faction_db.name)
+            if conflict is not None:
                 states.append('Conflict ({})'.format(conflict.stage))
-            except TypeError:
-                pass
         if faction_db.expansion is not 0:
             try:
                 expansion = database.fetch_expansion(__conn, faction_db.faction_id)
@@ -468,6 +460,10 @@ def get_non_natives_data():
                 inf3 = str(round(presence.influence[2] * 100, 2)) + '%'
                 if presence.influence[2] < 0.05:
                     inf3_highlight = 'warn'
+
+            conflict_db = database.fetch_conflict(__conn, sys_id=presence.system_id, fac_name=faction.name)
+            if conflict_db is not None and 'active' in conflict_db.stage:
+                inf1_highlight = 'blue'
             data = {
                 'name': faction.name,
                 'id': faction.faction_id,
@@ -581,8 +577,12 @@ def get_trend_data():
                         if presence.influence[i] > 0.695:
                             inf_highlight[i] = 'warn'
                 presence.influence[i] = str(round(presence.influence[i]*100, 2)) + '%'
-            influence.append((presence.influence[i], inf_highlight[i]))
+            influence.append([presence.influence[i], inf_highlight[i]])
             i += 1
+
+        conflict_db = database.fetch_conflict(__conn, sys_id=presence.system_id, fac_name=master.name)
+        if conflict_db is not None and 'active' in conflict_db.stage:
+            influence[0][1] = 'blue'
         data = {
             'name': system.name,
             'id': system.system_id,

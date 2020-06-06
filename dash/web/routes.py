@@ -105,7 +105,12 @@ def non_natives():
 @dash_app.route('/trends')
 def trends():
     trends_data = datafetch.get_trend_data()
-    return render_template('trends.html', page='Trends', trends=trends_data)
+    clipboard = ''
+    for inf in trends_data['systems']:
+        if clipboard is not '':
+            clipboard += '\r\n'
+        clipboard += str(inf['influence'][0][0])
+    return render_template('trends.html', page='Trends', trends=trends_data, clipboard=clipboard)
 
 
 @dash_app.route('/manage')
