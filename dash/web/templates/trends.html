@@ -13,7 +13,7 @@
         <tr class="content-row">
             <td><a href="{{ url_for('system', sf_id=system['id']) }}">{{ system["name"] }}</a></td>
             {% for influence in system["influence"] %}
-                <td>{{ influence }}</td>
+                <td class="cell-{{ influence[1] }}">{{ influence[0] }}</td>
             {% endfor %}
         </tr>
         {% endfor %}
