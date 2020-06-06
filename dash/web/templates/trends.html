@@ -41,7 +41,7 @@
         </tr>
         {% endfor %}
     </table>
-    <textarea type="text" id="clipboard">{{ clipboard }}</textarea>
+    <textarea type="text" id="clipboard" style="position:absolute;left:-1000px;top:-1000px;">{{ clipboard }}</textarea>
     <script>
         function clipboard() {
             var copyText = document.getElementById("clipboard");
