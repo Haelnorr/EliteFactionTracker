@@ -37,12 +37,11 @@ def parser(pipeline, shutdown):
 
             system_name = message['StarSystem']
 
-            try:
-                system_db = database.fetch_system(db_conn, system_name)
+            system_db = database.fetch_system(db_conn, system_name)
+            if system_db is not None:
                 log.info('System match found: %s; parsing data' % system_db.name)
                 __parse_data(system_db, message)
-
-            except (TypeError, AttributeError):
+            else:
                 log.debug('System match not found: %s; moving onto next message' % system_name)
 
     log.info('Shutting down Parser')
@@ -135,9 +134,9 @@ def __parse_data(system_db, message):
         current_list = []
         try:
             for conflict in message['Conflicts']:
-                try:
-                    conflict_db = database.fetch_conflict(db_conn, sys_id=system_db.system_id,
+                conflict_db = database.fetch_conflict(db_conn, sys_id=system_db.system_id,
                                                           fac_name=conflict['Faction1']['Name'])
+                if conflict_db is not None:
 
                     if conflict['Status'] == '':
                         database.delete_conflict(db_conn, conflict_db.conflict_id)
@@ -162,7 +161,7 @@ def __parse_data(system_db, message):
                         )
                         database.update_conflict(db_conn, conflict_entry)
                         log.info('Conflict updated: %s' % conflict_db.conflict_id)
-                except TypeError:
+                else:
                     # conflict not in database
                     if not conflict['Status'] == '':
                         conflict_entry = (
