@@ -5,13 +5,14 @@ from . import database
 from . import log
 
 __API_DATE_FMT = '%Y-%m-%dT%H:%M:%S.000Z'
+api_url = 'https://elitebgs.app/api/ebgs/v5/'
 
 
 def system_request(name):
     # requests data from the API on the system specified
     log.info('API system data requested: ' + name)
     query = '?name=' + parse.quote(name, safe='')
-    api = 'https://elitebgs.app/api/ebgs/v4/systems'
+    api = api_url + 'systems'
     r = get(api + query)
     data = r.json()
     log.info('API system data received')
@@ -41,7 +42,7 @@ def faction(name):
     """
     log.info('API faction data requested: ' + name)
     query = '?name=' + parse.quote(name, safe='')
-    api = 'https://elitebgs.app/api/ebgs/v4/factions'
+    api = api_url + 'factions'
     r = get(api + query)
     data = r.json()
     log.info('API faction data received')
@@ -70,7 +71,7 @@ def __faction_get_home_system(factionname):
 def __stations(system_name):
     # gets data from the API of all the stations in a specified system (currently unused)
     query = '?system=' + system_name
-    api = 'https://elitebgs.app/api/ebgs/v4/stations'
+    api = api_url + 'stations'
     r = get(api + query)
     data = r.json()
 
@@ -175,6 +176,10 @@ def new_faction(faction_name):
             system['influence'],
             system['influence'],
             system['influence'],
+            system['influence'],
+            system['influence'],
+            system['influence'],
+            system['influence'],
             timestamp
         )
         # store data
@@ -240,6 +245,10 @@ def new_faction(faction_name):
                 presence_entry = (
                     _system_id,
                     _secondary_faction['id'],
+                    system['influence'],
+                    system['influence'],
+                    system['influence'],
+                    system['influence'],
                     system['influence'],
                     system['influence'],
                     system['influence'],

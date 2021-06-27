@@ -1,3 +1,6 @@
+from . import exceptions
+
+
 class System:
     """A 'System' object for use with the database 'System' table
     :param data: the data of the system entry
@@ -20,7 +23,10 @@ class Faction:
         """
     def __init__(self, data):
 
-        self.faction_id = data[0]
+        try:
+            self.faction_id = data[0]
+        except TypeError:
+            raise exceptions.NullFaction
         self.name = data[1]
         self.home_system_id = data[2]
         self.expansion = data[3]

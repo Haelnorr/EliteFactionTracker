@@ -1,9 +1,11 @@
 import sqlite3
 from sqlite3 import Error
 import os.path
+from . import exceptions
 from . import classes
 from . import log
 from .definitions import ROOT_DIR
+from . import bgsapi
 
 DATETIME_FMT = '%Y-%m-%d %H:%M:%S'
 
@@ -263,7 +265,17 @@ def fetch_faction(conn, faction=None):
             cur.execute('SELECT * FROM Faction WHERE faction_id=?', (faction,))
         except ValueError:
             cur.execute('SELECT * FROM Faction WHERE name=?', (faction,))
-        f = classes.Faction(cur.fetchone())
+        try:
+            f = classes.Faction(cur.fetchone())
+        except exceptions.NullFaction:
+            bgsapi.new_faction(faction)
+            try:
+                int(faction)
+                cur.execute('SELECT * FROM Faction WHERE faction_id=?', (faction,))
+            except ValueError:
+                cur.execute('SELECT * FROM Faction WHERE name=?', (faction,))
+            f = classes.Faction(cur.fetchone())
+
     else:
         cur.execute('SELECT * FROM Faction')
         for faction in cur.fetchall():
