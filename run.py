@@ -8,12 +8,21 @@ from .listener import receiver
 from .listener import parser
 import time
 from datetime import datetime
+import signal
+import sys
 
 filename = 'tracker-%s' % datetime.strftime(datetime.now(), '%Y-%m-%d-%H-%M-%S')
 
 log.start(filename)
 conn = database.connect()
 shutdown = threading.Event()
+
+
+def signal_handler(sig, frame):
+    shutdown.set()
+
+
+signal.signal(signal.SIGINT, signal_handler)
 
 
 def main():
