@@ -265,16 +265,7 @@ def fetch_faction(conn, faction=None):
             cur.execute('SELECT * FROM Faction WHERE faction_id=?', (faction,))
         except ValueError:
             cur.execute('SELECT * FROM Faction WHERE name=?', (faction,))
-        try:
-            f = classes.Faction(cur.fetchone())
-        except exceptions.NullFaction:
-            bgsapi.new_faction(faction)
-            try:
-                int(faction)
-                cur.execute('SELECT * FROM Faction WHERE faction_id=?', (faction,))
-            except ValueError:
-                cur.execute('SELECT * FROM Faction WHERE name=?', (faction,))
-            f = classes.Faction(cur.fetchone())
+        f = classes.Faction(cur.fetchone())
 
     else:
         cur.execute('SELECT * FROM Faction')

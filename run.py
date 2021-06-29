@@ -1,5 +1,6 @@
 import queue
 import concurrent.futures
+import traceback
 from . import log
 from . import database
 from . import bgsapi

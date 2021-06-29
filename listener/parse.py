@@ -1,8 +1,8 @@
 import requests
-
 from .. import bgsapi
 from .. import database
 from .. import log
+from ..exceptions import NullFaction, NullPresence
 from datetime import datetime
 
 __TIME_FMT = '%Y-%m-%dT%H:%M:%SZ'
@@ -55,6 +55,7 @@ def __parse_data(system_db, message):
     factions = []
 
     master = database.query(db_conn, 'SELECT faction_id FROM Faction WHERE master=0')[0][0]
+    log.debug('Master faction set to %s' % master)
     # this line is a dirty, unclean way of selecting the faction ID of the faction set as the master faction. It
     # queries which faction is set as master and returns its faction ID before extracting it from the array and list
     # that the function returns
@@ -62,18 +63,22 @@ def __parse_data(system_db, message):
     # debounce influence data
 
     latest_tick = tick()
+    log.debug('Latest tick recorded as %s' % latest_tick)
 
     for faction in message['Factions']:
         influence = faction['Influence']
         faction_name = faction['Name']
         # exclude pilots fed local branch (present in all systems)
         if 'Pilots\' Federation Local Branch' not in faction_name:
-            try:    # attempt to pull the faction from the database
+            log.debug('Attempting to pull faction data for %s from database' % faction_name)
+            try:  # attempt to pull the faction from the database
                 faction_db = database.fetch_faction(db_conn, faction_name)
 
                 presence_db = database.fetch_presence(db_conn, sys_id=system_db.system_id, fac_id=faction_db.faction_id)
 
                 db_timestamp = datetime.strptime(presence_db.updated_at, database.DATETIME_FMT)
+                log.debug('Data request successful')
+                log.debug('Data timestamp: %s' % db_timestamp)
                 if db_timestamp < latest_tick:
                     time_diff = datetime.utcnow() - db_timestamp
                     if not influence == presence_db.influence[0]:
@@ -83,11 +88,13 @@ def __parse_data(system_db, message):
 
                 # group old and new data together and add to list
                 factions.append((faction, faction_db, presence_db))
-            except TypeError:   # faction wasn't in the database
+                log.debug('Faction data for %s has been added to list for processing' % faction_name)
+            except (NullFaction, NullPresence):  # faction wasn't in the database
                 log.debug('Faction not tracked: %s' % faction_name)
 
                 # add to list with 'False' flag to indicate its not tracked
                 factions.append((faction, False))
+                log.debug('Faction data added to list with untracked flag')
                 cached = False
 
     # debounce conflicts if influences are static
@@ -135,7 +142,7 @@ def __parse_data(system_db, message):
         try:
             for conflict in message['Conflicts']:
                 conflict_db = database.fetch_conflict(db_conn, sys_id=system_db.system_id,
-                                                          fac_name=conflict['Faction1']['Name'])
+                                                      fac_name=conflict['Faction1']['Name'])
                 if conflict_db is not None:
 
                     if conflict['Status'] == '':
@@ -202,12 +209,12 @@ def __parse_data(system_db, message):
             if faction[1] is not False:  # 'not tracked' flag was not set
                 current_list.append(faction[1].faction_id)
                 # check states
-                try:    # check for pending states
+                try:  # check for pending states
                     for state in faction[0]['PendingStates']:
                         if state['State'] in 'Expansion':
                             # expansion found
                             expansion = True
-                            try:    # check if expansion is in database and update
+                            try:  # check if expansion is in database and update
                                 database.fetch_expansion(db_conn, faction[1].faction_id)
                                 expansion_entry = (
                                     'Pending',
@@ -216,7 +223,7 @@ def __parse_data(system_db, message):
                                 )
                                 database.update_expansion(db_conn, expansion_entry)
                                 log.info('Updated expansion for: %s' % faction[1].name)
-                            except TypeError:   # expansion not in database
+                            except TypeError:  # expansion not in database
                                 # new expansion found
                                 expansion_entry = (
                                     faction[1].faction_id,
@@ -231,7 +238,7 @@ def __parse_data(system_db, message):
                         if state['State'] in 'Retreat':
                             retreat = True
                             # retreat found
-                            try:    # check if retreat is in database and update
+                            try:  # check if retreat is in database and update
                                 # retreat exists
                                 retreat_db = database.fetch_retreat(db_conn, faction[1].faction_id,
                                                                     sys_id=system_db.system_id)
@@ -242,7 +249,7 @@ def __parse_data(system_db, message):
                                 )
                                 database.update_retreat(db_conn, retreat_entry)
                                 log.info('Updated retreat for %s in %s' % (faction[1].name, system_db.name))
-                            except TypeError:   # retreat not in database, add it
+                            except TypeError:  # retreat not in database, add it
                                 # new retreat found
                                 retreat_entry = (
                                     system_db.system_id,
@@ -257,12 +264,12 @@ def __parse_data(system_db, message):
                     # no pending states found
                     log.debug('No pending states for %s' % faction[1].name)
 
-                try:    # check for active states
+                try:  # check for active states
                     for state in faction[0]['ActiveStates']:
                         if state['State'] in 'Expansion':
                             expansion = True
                             # expansion found
-                            try:    # check if expansion is in database and update it
+                            try:  # check if expansion is in database and update it
                                 database.fetch_expansion(db_conn, faction[1].faction_id)
                                 expansion_entry = (
                                     'Active',
@@ -272,7 +279,7 @@ def __parse_data(system_db, message):
                                 database.update_expansion(db_conn, expansion_entry)
                                 log.info('Updated expansion for: %s' % faction[1].name)
 
-                            except TypeError:   # expansion not in database, add it
+                            except TypeError:  # expansion not in database, add it
                                 # new expansion found
                                 expansion_entry = (
                                     faction[1].faction_id,
@@ -287,7 +294,7 @@ def __parse_data(system_db, message):
                         if state['State'] in 'Retreat':
                             retreat = True
                             # retreat found
-                            try:    # check if retreat is in database and update
+                            try:  # check if retreat is in database and update
                                 # retreat exists
                                 retreat_db = database.fetch_retreat(db_conn, faction[1].faction_id,
                                                                     sys_id=system_db.system_id)
@@ -298,7 +305,7 @@ def __parse_data(system_db, message):
                                 )
                                 database.update_retreat(db_conn, retreat_entry)
                                 log.info('Updated retreat for %s in %s' % (faction[1].name, system_db.name))
-                            except TypeError:   # retreat not in database, add it
+                            except TypeError:  # retreat not in database, add it
                                 # new retreat found
                                 retreat_entry = (
                                     system_db.system_id,
@@ -313,27 +320,27 @@ def __parse_data(system_db, message):
                     # no active states found
                     log.debug('No active states for %s' % faction[1].name)
 
-                try:    # check for recovering states
+                try:  # check for recovering states
                     for state in faction[0]['RecoveringStates']:
                         if 'Expansion' in state['State']:
                             # expansion found
-                            try:    # check if expansion is in database
+                            try:  # check if expansion is in database
                                 database.fetch_expansion(db_conn, faction[1].faction_id)
                                 database.delete_expansion(db_conn, faction[1].faction_id)
                                 log.debug('Deleted expansion for: %s' % faction[1].name)
 
-                            except TypeError:   # expansion not in database
+                            except TypeError:  # expansion not in database
                                 # new expansion found
                                 log.debug('Recovering expansion found: %s' % faction[1].name)
                         if state['State'] in 'Retreat':
                             # retreat found
-                            try:    # check if retreat is in database and delete
+                            try:  # check if retreat is in database and delete
                                 retreat_db = database.fetch_retreat(db_conn, faction[1].faction_id,
                                                                     sys_id=system_db.system_id)
                                 database.delete_retreat(db_conn, retreat_db.retreat_id)
                                 log.debug('Deleted retreat for: %s' % faction[1].name)
 
-                            except TypeError:   # retreat not in database
+                            except TypeError:  # retreat not in database
                                 # new retreat found
                                 log.debug('Recovering retreat found for %s in %s' % (faction[1].name, system_db.name))
                 except KeyError:

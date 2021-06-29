@@ -1,4 +1,5 @@
 from . import exceptions
+from . import log
 
 
 class System:
@@ -26,6 +27,7 @@ class Faction:
         try:
             self.faction_id = data[0]
         except TypeError:
+            log.debug('Faction data requested for faction that is not tracked.')
             raise exceptions.NullFaction
         self.name = data[1]
         self.home_system_id = data[2]
@@ -41,8 +43,16 @@ class Presence:
         """
     def __init__(self, data):
 
-        self.system_id = data[0]
-        self.faction_id = data[1]
+        try:
+            self.system_id = data[0]
+        except TypeError:
+            log.debug('Presence data requested for an entry that is not yet entered for the specified system.')
+            raise exceptions.NullPresence
+        try:
+            self.faction_id = data[1]
+        except TypeError:
+            log.debug('Presence data requested for an entry that is not yet entered for the specified faction in the system.')
+            raise exceptions.NullPresence
         self.influence = [
             data[2],
             data[3],

@@ -50,7 +50,7 @@ def dashboard():
     alert_list = alert_data[0]
     alert_count = (alert_data[1], len(alert_list))
     factions = datafetch.get_tracked_factions()
-    notice_list = Notice.query.filter(or_(Notice.expiry > datetime.utcnow(), None == Notice.expiry)).filter(Notice.priority == 1)
+    notice_list = Notice.query.filter(or_(Notice.expiry > datetime.utcnow(), None == Notice.expiry)).filter(Notice.priority == 1).order_by(Notice.timestamp.desc())
     resp = make_response(render_template('index.html', page='Dashboard', alerts=alert_list, alert_count=alert_count, factions=factions, notices=notice_list, order=order))
     return resp
 
