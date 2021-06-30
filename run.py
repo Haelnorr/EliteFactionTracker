@@ -20,6 +20,7 @@ shutdown = threading.Event()
 
 
 def signal_handler(sig, frame):
+    print('signal handled')
     shutdown.set()
 
 
@@ -53,11 +54,15 @@ def main():
 
         while not shutdown.is_set():
             if not _receiver.running():
-                log.error('Listener Exception: %s' % _receiver.exception())
+                exception = _receiver.exception()
+                log.error('Listener Exception: %s' % exception)
+                traceback.print_tb(exception.__traceback__)
                 time.sleep(5)
                 _receiver = executor.submit(receiver, pipeline, shutdown)
             elif not _parser.running():
-                log.error('Consumer Exception: %s' % _parser.exception())
+                exception = _parser.exception()
+                log.error('Consumer Exception: %s' % exception)
+                traceback.print_tb(exception.__traceback__)
                 time.sleep(5)
                 _parser = executor.submit(parser, pipeline, shutdown)
 
